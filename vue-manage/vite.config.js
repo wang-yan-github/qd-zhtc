@@ -10,7 +10,7 @@ export default {
         host: '0.0.0.0',
         proxy: {
             '/dev': {
-                target: 'http://192.168.0.104:8081',
+                target: 'http://192.168.30.123:8082',
                 changeOrigin: true,
                 rewrite: path => path.replace(/^\/dev/, '')
             },
