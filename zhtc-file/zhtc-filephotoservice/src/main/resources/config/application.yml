@@ -8,7 +8,7 @@ spring:
       name: dubbo-provider
 logging:
     # 保存日志文件目录路径
-    file: C:\\app.log
+    file: /Users/wangyan/Desktop/app.log
     # 日志级别
     level:
       # 配置spring web日志级别
@@ -17,7 +17,7 @@ dubbo:
   application:
     name: dubbo-provider
   registry:
-    address: 192.168.0.170:2181
+    address: zookeeper:2181
     protocol: zookeeper
     check: false
   protocol:
@@ -30,4 +30,4 @@ dubbo:
     timeout: 3000
 jsdc:
 #  fileUrl: D:/upload/
-  fileUrl: E:/upload/
+  fileUrl: /Users/wangyan/Desktop/upload/
