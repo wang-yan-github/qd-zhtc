@@ -1,0 +1,141 @@
+﻿@charset "utf-8";
+/*地图标题 infoWindow*/
+ .BMap_bubble_title {
+     color: #fff;
+     font-size: 16px;
+     font-weight: bold;
+     text-align: left;
+     background: transparent !important;
+ }
+.BMap_bubble_top,.BMap_bubble_title,.BMap_bubble_buttons{
+    height: 0 !important;
+    overflow: hidden !important;
+}
+.BMap_pop .BMap_top {
+    background: rgba(7,44,76, .8) !important;
+    border: 0 !important;
+}
+
+.BMap_pop .BMap_center {
+    /* width: 281px !important; */
+    border: 0 !important;
+    background: rgba(7,44,76, .8) !important;   
+}
+.BMap_bubble_pop{
+    background: rgba(3,19,51, .8) !important;
+    border: 1px solid rgba(7,44,76, .8) !important;   
+    border-radius:5px!important;
+}
+.p10{margin:0px 0 10px 0!important;}
+.BMap_bubble_pop img{display:none;}
+.BMap_bubble_center{min-height:120px!important}
+.BMap_bubble_pop .BMap_bubble_content{width: 280px !important;margin-top:0!important;}
+
+.BMap_bubble_content {max-width:600px!important;}
+.BMap_bubble_content {margin:10px 0 35px;}
+.BMap_bubble_content p{margin:0;}
+.BMap_bubble_content .title{font-size:16px;}
+.BMap_bubble_content video{width:360px;height:260px;}
+.playWnd{width:600px;height:400px;border: 1px solid red;margin:260px 0 0 650px;}
+.BMap_bubble_content .cont{font-size:14px;margin-top:10px;line-height:24px;}
+.BMap_bubble_content .cont .p1{color:#98badf;display:inline-block;}
+
+.BMap_bubble_content .titles{
+    font-size:16px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    position: relative;
+    padding: 0 13px;
+    box-sizing: border-box;
+}
+.BMap_bubble_content .titles i{display:inline-block;margin-left:10px;background:#444a5a;color:#fff;padding:0 15px;font-size:12px;border-radius:20px;line-height:24px;}
+
+.BMap_bubble_content .conts{font-size:14px;margin-top:10px;line-height:24px;}
+.BMap_bubble_content .conts .items{color:#cce7ff;display:block;}
+.BMap_bubble_content .conts .items i{display:inline-block;margin-right:10px;}
+
+
+
+.BMap_bubble_content .btnbox{margin-left:-5px;margin-top:5px;display: flex;justify-content:center;}
+.BMap_bubble_content .btns{border:0;height:32px;width: 45%; line-height:32px;padding:0 20px;background-color: rgba(28, 55, 104, 0.6);border: 1px solid #19659f;font-size:14px;text-align:center;display:inline-block;border-radius:20px;margin-top:10px;color:#fff;outline:medium;cursor:pointer;margin-left:5px;margin-right:5px;}
+.BMap_bubble_content .btns i{display:inline-block;margin-right:5px;font-size:14px;}
+.BMap_bubble_content .btns.disb{background:#ccc!important;}
+.BMap_bubble_content .redbtns{background:#ea0505!important;}
+.BMap_bubble_content .btns:hover{ackground-color: rgba(28, 55, 104, 1);border: 1px solid #3791d5;}
+.BMap_bubble_content .btns.close{
+    background-color: transparent;
+}
+
+.BMap_bubble_content .btnsfa{border:0;height:36px;line-height:36px;padding:0 20px;background: -webkit-linear-gradient(90deg, #0f6ee0, #2dbdf9) no-repeat;font-size:14px;text-align:center;display:inline-block;border-radius:3px;margin-top:10px;color:#fff;outline:medium;cursor:pointer;margin-left:5px;margin-right:5px;border:0px solid #37fcff;box-shadow:0 0 3px #000;}
+.BMap_bubble_content .btnsfa i{display:inline-block;margin-right:5px;font-size:14px;}
+.BMap_bubble_content .btnsfa.disb{background:#ccc!important;}
+
+.BMap_pop .BMap_bottom {
+    border: 0 !important;
+    background: rgba(7,44,76, .8) !important;
+    display:none!important;
+}
+
+.BMap_pop div:nth-child(3) {
+    background: transparent !important;
+}
+
+.BMap_pop div:nth-child(3) div {
+    border-radius: 3px;
+    background: rgba(7,44,76, .8) !important;
+    border: 0 !important;
+}
+
+.BMap_pop div:nth-child(1) {
+    border-radius: 3px 0 0 0;
+    background: transparent !important;
+    border: 0 !important;
+}
+
+.BMap_pop div:nth-child(1) div {
+    background: rgba(7,44,76, .8) !important;
+}
+
+.BMap_pop div:nth-child(5) {
+    border-radius: 0 0 0 3px;
+    background: transparent !important;
+    border: 0 !important;
+}
+
+.BMap_pop div:nth-child(5) div {
+    border-radius: 3px;
+    background: rgba(7,44,76, .8) !important;
+    display:none!important;
+}
+
+.BMap_pop div:nth-child(7) {
+    background: transparent !important;
+    display:none!important;
+/*    left: 226px;*/
+}
+.BMap_pop div:nth-child(9){height:auto!important;background: transparent!important;}
+.BMap_pop div:nth-child(7) div {
+    border-radius: 3px;
+    background: rgba(7,44,76, .8) !important;
+}
+
+/*替换箭头*/
+img[src="http://api.map.baidu.com/images/iw3.png"] {
+/*    content: url('../images/iw3.png');*/
+    width:1px !important;
+    height: 1px !important;
+}
+
+img[src="https://api.map.baidu.com/images/iw3.png"] {
+    opacity: 0.7;
+/*    margin-top: -692px !important;*/
+    filter: alpha(opacity=70);
+/*    content: url('../images/iw3.png');*/
+    width:1px !important;
+    height: 1px !important;
+}
+.anchorBL {
+    display: none !important;
+}
+.BMap_bubble_content{color:#fff!important;}

@@ -1,0 +1,145 @@
+# 变量
+variables:
+  MAVEN_CLI_OPTS: "-s .m2/settings-nexus.xml --batch-mode -Dmaven.test.skip=true -Dmaven.repo.local=.m2/repository -DaltDeploymentRepository=wangyan_hosted::default::http://nexus:8081/repository/wangyan_hosted"
+  API_PATH: 'zhtc-web'
+  API_NAME: 'qd-zhtc-web'
+  API_MQTT_PATH: 'zhtc-mqtt'
+  API_MQTT_NAME: 'qd-zhtc-mqtt'
+  WEB_PATH: 'vue-manage'
+  WEB_NAME: 'qd-zhtc'
+
+
+# 缓存
+cache:
+  key: ${CI_BUILD_REF_NAME}
+  paths:
+    - $WEB_PATH/node_modules/
+    - $WEB_PATH/dist/
+    - $WEB_PATH/$WEB_PATH/
+    - .m2/repository
+    - $API_PATH/target/
+    - $API_MQTT_PATH/target/
+
+# 阶段
+stages:
+  - maven install
+  - maven package
+  - deploy jar
+  - maven mqtt install
+  - maven mqtt package
+  - deploy mqtt jar
+  - npm install
+  - build vue
+  - deploy vue
+
+
+maven install:
+  image: maven:3.6.3-jdk-8-slim
+  stage: maven install
+  only:
+    - install
+  script:
+    - echo "=============== 开始编译任务  ==============="
+    - ls -l
+    - mvn $MAVEN_CLI_OPTS clean compile package deploy
+    - ls -l
+    - cd $API_PATH/target
+    - ls -l
+    - echo "=============== 执行结束 ==================="
+
+maven package:
+  image: maven:3.6.3-jdk-8-slim
+  stage: maven package
+  script:
+    - echo "=============== 开始编译任务  ==============="
+    - ls -l
+    - mvn $MAVEN_CLI_OPTS package
+    - ls -l
+    - cd $API_PATH/target
+    - ls -l
+    - echo "=============== 执行结束 ==================="
+
+deploy jar:
+  image: docker
+  stage: deploy jar
+  script:
+    - echo "=============== 开始部署任务  ==============="
+    - cd $API_PATH
+    - docker build --build-arg BUILD_DIR=./target -t $API_PATH:last .
+    - if [ "$(docker ps -aq --filter name=$API_NAME)" ]; then docker rm -f $API_NAME;fi
+    - docker run -d --network=my-network --name=$API_NAME $API_NAME:last
+    - echo "=============== 执行结束 ==================="
+
+maven mqtt install:
+  image: maven:3.6.3-jdk-8-slim
+  stage: maven mqtt install
+  only:
+    - install
+  script:
+    - echo "=============== 开始编译任务  ==============="
+    - ls -l
+    - mvn $MAVEN_CLI_OPTS clean compile package deploy
+    - ls -l
+    - cd $API_MQTT_PATH/target
+    - ls -l
+    - echo "=============== 执行结束 ==================="
+
+maven mqtt package:
+  image: maven:3.6.3-jdk-8-slim
+  stage: maven mqtt package
+  script:
+    - echo "=============== 开始编译任务  ==============="
+    - ls -l
+    - mvn $MAVEN_CLI_OPTS package
+    - ls -l
+    - cd $API_MQTT_PATH/target
+    - ls -l
+    - echo "=============== 执行结束 ==================="
+
+deploy mqtt jar:
+  image: docker
+  stage: deploy mqtt jar
+  script:
+    - echo "=============== 开始部署任务  ==============="
+    - cd $API_MQTT_PATH
+    - docker build --build-arg BUILD_DIR=./target -t $API_MQTT_PATH:last .
+    - if [ "$(docker ps -aq --filter name=$API_MQTT_NAME)" ]; then docker rm -f $API_MQTT_NAME;fi
+    - docker run -d --network=my-network --name=$API_MQTT_NAME $API_MQTT_NAME:last
+    - echo "=============== 执行结束 ==================="
+
+npm install:
+  image: node:16.20-alpine
+  stage: npm install
+  only:
+    - install
+  script:
+    - echo "=============== 开始安装任务  ==============="
+    - cd $WEB_PATH
+    - ls -l
+    #    - npm install html-webpack-plugin --save-dev --legacy-peer-deps
+    - npm install --legacy-peer-deps
+    - ls -l
+    - echo "=============== 执行结束 ==================="
+
+build vue:
+  image: node:16.20-alpine
+  stage: build vue
+  script:
+    - echo "=============== 开始打包任务  ==============="
+    - cd $WEB_PATH
+    - ls -l
+    - npm run build
+    - ls -l
+    - rm -rf $WEB_PATH
+    - mv dist $WEB_PATH
+    - echo "=============== 执行结束 ==================="
+
+deploy vue:
+  image: docker
+  stage: deploy vue
+  script:
+    - echo "=============== 开始部署任务  ==============="
+    - cd $WEB_PATH
+    - ls
+    - docker cp $WEB_PATH gitlab-runner:/html/$CONTAINER_WEB_NAME
+    - echo "=============== 执行结束 ==================="

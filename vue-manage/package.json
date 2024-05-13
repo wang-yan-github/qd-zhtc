@@ -1,0 +1,42 @@
+{
+  "name": "zhihuitingche",
+  "version": "5.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "start": "vite --host 0.0.0.0",
+    "build": "vite build",
+    "serve": "vite preview"
+  },
+  "dependencies": {
+    "axios": "^0.21.1",
+    "echarts": "^5.2.2",
+    "element-plus": "1.0.2-beta.52",
+    "flv.js": "^1.6.2",
+    "js-md5": "^0.8.3",
+    "js-pinyin": "^0.2.5",
+    "moment": "^2.29.1",
+    "qrcode": "^1.5.0",
+    "qrcodejs2": "0.0.2",
+    "vue": "~3.3.4",
+    "vue-cropperjs": "5.0.0",
+    "vue-i18n": "^9.0.0",
+    "vue-qr": "^3.2.4",
+    "vue-router": "^4.0.10",
+    "vue-schart": "^2.0.0",
+    "vue-ueditor-wrap": "^2.5.6",
+    "vuex": "^4.0.2",
+    "wangeditor": "^4.7.4",
+    "xlsx": "^0.17.4"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^1.2.3",
+    "@vue/compiler-sfc": "^3.1.2",
+    "vite": "2.3.7"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ]
+}

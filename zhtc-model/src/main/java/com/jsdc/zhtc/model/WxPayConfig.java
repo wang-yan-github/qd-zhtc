@@ -1,0 +1,86 @@
+package com.jsdc.zhtc.model;
+
+import com.baomidou.mybatisplus.annotation.*;
+import com.baomidou.mybatisplus.extension.activerecord.Model;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.Data;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
+
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import java.io.Serializable;
+import java.util.Date;
+
+/**
+ * 类 名: 微信支付配置
+ * 描 述: WxPayConfig
+ * 作 者: lw
+ * 创 建：2021/12/30 14:34
+ * 版 本：v1.0.0
+ * 历 史: (版本) 作者 时间 注释
+ */
+@Entity
+@TableName("wx_pay_config")
+@Table(name = "wx_pay_config")
+@DynamicInsert
+@DynamicUpdate
+@Data
+public class WxPayConfig extends Model<WxPayConfig> implements Serializable {
+    @Id
+    @TableId(type = IdType.INPUT)
+    private Integer id;
+
+    // 名称
+    private String name;
+
+    // 访问地址 url
+    private String pay_url = "https://api.mch.weixin.qq.com";
+
+    // 应用id appid
+    private String app_id = "wx7d7b0c3c9086b462";
+
+    // 商户号
+    private String mch_id = "1608882256";
+
+    // API密钥
+    private String app_key = "XZJJJSKFQjrzhtc12345678912345678";
+
+    // APIv3密钥
+    private String APIv3_key = "JSDCKJYXGSzhtcwxzf12345678912345";
+
+    // 你的商户私钥
+//    private String private_key = "-----BEGIN PRIVATE KEY-----\n"
+//            +"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\n"
+//            + "-----END PRIVATE KEY-----\n";
+
+    private String private_key = "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";
+
+    // 商户API证书序列号
+    private String serial_no = "323845D2609EDEC9F5BCB7496E4A1CC3085E27EC";
+
+    //创建时间
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @TableField(fill = FieldFill.INSERT)
+    private Date create_time;
+
+    //创建人
+    private Integer create_user;
+
+    //更新时间
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @TableField(fill = FieldFill.UPDATE)
+    private Date update_time;
+
+    // 更新人
+    private Integer update_user;
+
+    //是否为默认 0 默认  1 非默认
+    private Integer is_default;
+
+    // 是否删除
+    private String is_del;
+
+
+}

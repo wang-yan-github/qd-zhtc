@@ -1,0 +1,292 @@
+/*
+* @Author: Administrator
+* @Date:   2021-10-14 10:56:43
+* @Last Modified by:   Administrator
+* @Last Modified time: 2021-10-14 15:12:22
+*/
+.loginbody{background:url(../img/loginbg.jpg) no-repeat;background-size:cover;padding-top:13.333vw;}
+
+::-webkit-input-placeholder {
+color:#ccc
+}
+:-moz-placeholder {
+color:#ccc
+}
+::-moz-placeholder {
+color:#ccc
+}
+:-ms-input-placeholder {
+color:#ccc
+}
+
+.main-mod {padding: 6vw 6vw 0}
+.main-mod h2 {
+	line-height: 4.8vw;
+	font-size: 4.267vw;
+	text-align:left;
+	color:#000;
+	font-weight:500;
+	position:relative;
+}
+.main-mod h2:after{content:"";position:absolute;width:8vw;height:1vw;background: -webkit-linear-gradient(-90deg, #9ad97b, #67C23A) no-repeat;left:0;bottom:-3vw;border-radius:1vw;}
+
+.main-mod .form-main {
+	padding-top: 8.8vw;
+}
+.input-item {
+	position: relative;
+	z-index: 1;
+	margin-top:2vw;
+	width: 100%;
+	padding: 3.467vw 4.267vw;
+	background:#f5f5f5;
+	border-radius:3vw;
+	border-bottom:1px solid #f5f5f5;
+}
+.password-item{margin-top:6.267vw;}
+.input-item input {
+	width:60%;
+	line-height: 1;
+	font-size: 3.667vw;
+	border: 0 none;
+	margin-bottom: 1px;
+    background:transparent;
+	vertical-align: top;
+	color:#333;
+	
+}
+.input-item input:-webkit-autofill {
+-webkit-box-shadow:0 0 0 10000px #fff inset !important;
+-webkit-text-fill-color:#222 !important;
+}
+.body-con{display: flex;flex-direction: column;align-items: center;padding-top:8vw;}
+.loginbg{background:#fff;border-radius:10px;width:90%;padding-bottom:8vw;}
+
+.input-item .input-empty {
+	width: 4vw;
+	line-height: 4vw;
+	overflow: hidden;
+	position: absolute;
+	right: 4vw;
+	top: 0;
+	bottom: 0;
+
+	display: none;
+
+}
+.input-item i{display:inline-block;font-size:4vw;color:#bbb;vertical-align: -3.267vw;}
+.input-item .input-showText {
+	width: 4vw;
+	line-height: 4vw;
+	overflow: hidden;
+	position: absolute;
+	right: 4vw;
+	top: 0;
+	bottom: 0;
+	/* background: url(../img/pass-hide.png) no-repeat center center;
+	background-size: 24px 12px; */
+}
+.input-item .input-hideText {
+	width: 4vw;
+	line-height: 4vw;
+	overflow: hidden;
+	position: absolute;
+	right: 8vw;
+	top: 0;
+	bottom: 0;
+	/* background: url(../img/pass-show.png) no-repeat center center;;
+	background-size: 28px 18px */
+}
+.btn-item {
+	margin-top: 8.667vw;
+}
+.btn-item button{
+	display: block;
+	line-height: 1;
+	padding: 3.467vw 0;
+	background: -webkit-linear-gradient(-90deg, #9ad97b, #67C23A) no-repeat;
+	text-align: center;
+	font-size: 4.267vw;
+	color: #fff;
+	-webkit-border-radius: 3vw;
+	border-radius: 3vw;
+	opacity: .3;
+	width:100%;
+	border:0;
+}
+.btn-item .el-visible {
+	opacity: 1!important;
+}
+.main-mod .related {
+	line-height: 4.267vw;
+	padding: 4vw 0;
+	color: #545c75;
+	font-size: 3.667vw;
+	text-align: right
+}
+.main-mod .related a {
+	display: inline-block;
+	color: #545c75;
+}
+.main-mod .other-login {
+	padding-bottom: 6vw;
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	z-index: 1;	
+	display: block;
+}
+.main-mod .other-login h5 {
+	height: 4.267vw;
+	line-height: 4.267vw;
+	color: #333;
+	font-size: 3.267vw;
+	font-weight: normal;
+	text-align: center
+}
+.main-mod .other-login h5:before, .main-mod .other-login h5:after {
+	width: 10vw;
+	height: 1px;
+	overflow: hidden;
+	content: "";
+	background: #ccc;
+	display: inline-block;
+	margin: 0 4vw 0;
+	vertical-align: middle
+}
+.main-mod .other-login .phone{text-align:center;line-height:10vw;font-size:4.267vw;color:#67C23A;}
+.main-mod .other-login .phone i{display:inline-block;margin-right:2vw;font-size:4.267vw;}
+.main-mod .other-login .about{font-size:3.267vw;text-align:center;line-height:6vw;}
+.main-mod .other-login .about a{color:#67C23A;}
+
+
+.password-item .input-empty {
+	right: 12vw;
+}
+
+.loadMod {
+	position: fixed;
+	left: 0;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	padding-top: 40%;
+	background: rgba(0,0,0,.7);
+	z-index: 980;
+	display: none
+}
+.loadIcon {
+	width: 2rem;
+	height: 2rem;
+	margin: 0 auto;
+	position: relative
+}
+.loadIcon span {
+	display: inline-block;
+	width: .32rem;
+	height: .32rem;
+	-moz-border-radius: 50%;
+	-webkit-border-radius: 50%;
+	border-radius: 50%;
+	background: #249ff6;
+	position: absolute;
+	-webkit-animation: load 1.04s ease infinite;
+	-moz-animation: load 1.04s ease infinite;
+	animation: load 1.04s ease infinite
+}
+@-moz-keyframes load {
+0% {
+opacity:1
+}
+100% {
+opacity:.2
+}
+}
+@-webkit-keyframes load {
+0% {
+opacity:1
+}
+100% {
+opacity:.2
+}
+}
+@keyframes load {
+0% {
+opacity:1
+}
+100% {
+opacity:.2
+}
+}
+.loadIcon span:nth-child(1) {
+	left: 0;
+	top: 50%;
+	margin-top: -0.16rem;
+	-moz-animation-delay: .13s;
+	-webkit-animation-delay: .13s;
+	animation-delay: .13s
+}
+.loadIcon span:nth-child(2) {
+	left: .24rem;
+	top: .24rem;
+	-moz-animation-delay: .26s;
+	-webkit-animation-delay: .26s;
+	animation-delay: .26s
+}
+.loadIcon span:nth-child(3) {
+	left: 50%;
+	top: 0;
+	margin-left: -0.16rem;
+	-moz-animation-delay: .39s;
+	-webkit-animation-delay: .39s;
+	animation-delay: .39s
+}
+.loadIcon span:nth-child(4) {
+	top: .24rem;
+	right: .24rem;
+	-moz-animation-delay: .52s;
+	-webkit-animation-delay: .52s;
+	animation-delay: .52s
+}
+.loadIcon span:nth-child(5) {
+	right: 0;
+	top: 50%;
+	margin-top: -0.16rem;
+	-moz-animation-delay: .65s;
+	-webkit-animation-delay: .65s;
+	animation-delay: .65s
+}
+.loadIcon span:nth-child(6) {
+	right: .24rem;
+	bottom: .24rem;
+	-moz-animation-delay: .78s;
+	-webkit-animation-delay: .78s;
+	animation-delay: .78s
+}
+.loadIcon span:nth-child(7) {
+	bottom: 0;
+	left: 50%;
+	margin-left: -0.16rem;
+	-moz-animation-delay: .91s;
+	-webkit-animation-delay: .91s;
+	animation-delay: .91s
+}
+.loadIcon span:nth-child(8) {
+	bottom: .24rem;
+	left: .24rem;
+	-moz-animation-delay: 1.04s;
+	-webkit-animation-delay: 1.04s;
+	animation-delay: 1.04s
+}
+.loadIcon p {
+	line-height: 1;
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 50%;
+	margin-top: -.14rem;
+	font-size: .28rem;
+	text-align: center;
+	color: #249ff6
+}

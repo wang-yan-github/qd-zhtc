@@ -1,0 +1,295 @@
+.id-card-btn-box {
+    overflow: hidden;
+}
+
+.id-card-btn-box .layui-btn {
+    float: left;
+    margin-right: 10px;
+}
+
+.upload-card {
+    margin: 10px 0;
+    width: 260px;
+    height: 177px;
+    background-color: #fafbff;
+}
+
+.layui-form-item .layui-input-inline.face-img-box {
+    width: 180px;
+}
+
+.layui-form-item .layui-input-inline.face-proving-box {
+    width: auto;
+    margin-right: 10px;
+}
+
+.upload-face {
+    margin: 10px 0;
+    width: 134px;
+    height: 154px;
+    background-color: #fafbff;
+}
+
+.upload-card img,
+.upload-face img {
+    display: inline-block;
+    width: 100%;
+    height: 100%;
+}
+
+.photo-device {
+    display: none;
+}
+
+.patient-mesg {
+    width: 100%;
+    overflow: hidden;
+}
+
+.patient-mesg p {
+    float: left;
+    margin-right: 20px;
+    color: #999;
+}
+
+.patient-mesg p label {
+    color: #333;
+}
+
+.patient-detail p {
+    line-height: 20px;
+    padding: 9px 0;
+}
+
+.material-patient {
+    padding: 14px 20px 0 0;
+}
+
+.material-patient .material-img {
+    margin: 0 auto 6px;
+    width: 100%;
+    height: 220px;
+    border: 1px solid #eeeeee;
+}
+
+.material-patient .material-img img {
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+}
+
+.material-patient .material-title {
+    width: 100%;
+    text-align: center;
+    line-height: 20px;
+    font-size: 14px;
+}
+
+.meterial-detail .layui-card {
+    box-shadow: transparent;
+    border: 1px solid #efefef;
+    box-sizing: border-box;
+}
+
+.enlarge-img {
+    width: 800px;
+    height: 600px;
+    text-align: center;
+}
+
+.verify-paitient-name {
+    width: 600px;
+}
+
+.verify-paitient-name p {
+    line-height: 20px;
+    padding: 9px 0px;
+}
+
+.record-patient {
+    overflow: hidden;
+}
+
+.record-patient label {
+    display: block;
+    float: left;
+}
+
+.record-code {
+    overflow: hidden;
+}
+
+.record-code li {
+    float: left;
+    margin-right: 6px;
+    margin-bottom: 2px;
+    padding: 9px 8px;
+    border: 1px dashed #ddd;
+}
+
+.record-mid.layui-form-mid {
+    padding: 0 !important;
+}
+
+.record-block label {
+    padding: 9px 0;
+}
+
+.record-img-show label {
+    position: absolute;
+    padding: 9px 0;
+}
+
+.record-img {
+    margin-left: 70px;
+    position: relative;
+}
+
+.patient-detail .record-fild {
+    padding: 20px;
+}
+
+.layui-input-inline.order-array {
+    width: 110px;
+    line-height: 38px;
+}
+
+.order-array .layui-form-switch {
+    margin-top: 0;
+}
+
+.photos-tips {
+    padding: 14px;
+}
+
+.photos-tips i {
+    margin-right: 4px;
+    color: #FFB800;
+}
+
+.photos-tips p {
+    line-height: 20px;
+    vertical-align: middle;
+    color: #333;
+    font-size: 14px;
+}
+
+.buy-pay-contant .layui-form-label {
+    width: 120px;
+}
+
+.buy-pay-contant .layui-input-block {
+    margin-left: 150px;
+}
+
+.check-info-label .layui-form-label {
+    width: 180px;
+}
+
+.check-info-label .layui-input-block {
+    margin-left: 210px;
+}
+
+.item-list-patient {
+    padding: 20px;
+}
+
+.no-upload-img-red {
+    color: red;
+}
+
+.item-list-patient .layui-form-label {
+    width: auto;
+    padding-left: 0;
+}
+
+.item-list-patient .layui-form-item {
+    margin-bottom: 0;
+}
+
+.mgtop24 {
+    margin-top: 24px;
+}
+
+.layui-form-item.mgtop24 .layui-btn {
+    margin-left: 100px;
+}
+
+.proving-con0 {
+    padding: 20px;
+    line-height: 24px;
+    font-size: 14px;
+    color: #FF5722;
+}
+
+.proving-select-person {
+    margin: 20px auto 10px;
+    width: 620px;
+}
+
+.proving-select-person .layui-form-radio {
+    margin: 0;
+}
+
+.proving-red-tip .layui-word-aux {
+    color: #FF5722 !important;
+}
+
+.photos-warn-red {
+    color: #ff0000;
+}
+
+.photos-warn-blue {
+    color: #0000ff;
+}
+
+.layui-input-inline.check30 .layui-unselect div {
+    width: 30px;
+}
+
+.layui-table.table-padding5 td,
+.layui-table.table-padding5 th,
+.layui-table.table-icon-margin0 td,
+.layui-table.table-icon-margin0 th {
+    padding: 5px;
+}
+
+.layui-table.table-icon-margin0 .layui-btn .layui-icon,
+.layui-table.table-padding5 .layui-btn .layui-icon {
+    margin-right: 0;
+}
+
+.layui-table.table-icon-margin0 .layui-table-cell,
+.layui-table.table-padding5 .layui-table-cell {
+    padding: 0 5px;
+}
+
+.patient-codes {
+    display: inline-block;
+    border: 1px dashed #ddd;
+    padding: 4px;
+    margin-right: 6px;
+    margin-bottom: 6px;
+    line-height: 18px;
+}
+.shot-detail p{
+	padding: 3px 0;
+}
+.shot-color{
+	display: inline-block;
+	width: 4px;
+	height: 16px;
+	position: absolute;
+	top: 22px;
+	left: 0;
+	background-color:#009688;
+	border-radius: 0 2px 2px 0;
+}
+.shot-record{
+	display: inline-block;
+	cursor: pointer;
+	font-size: 14px;
+}
+.shot-record span{
+	text-decoration: underline;
+}

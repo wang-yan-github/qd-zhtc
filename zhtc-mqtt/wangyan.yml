@@ -1,0 +1,32 @@
+#设置端口
+server:
+  port: 80
+  tomcat:
+    port-header: HEAD,PUT,DELETE,OPTIONS,TRACE,COPY,SEARCH,PROPFIND
+
+spring:
+  application:
+    name: pos
+  profiles:
+    active: wangyan
+
+mqtt:
+  subTopic: "/a1BkUFnh0eA/108e6e026d0e2a63/user/update"
+  pubTopic: "/a1BkUFnh0eA/108e6e026d0e2a63/user/set"
+  broker: "tcp://mqtt:1883"
+  #  broker: "tcp://192.168.0.170:1883"
+  subClientId: "sub_client"
+  pubClientId: "pub_client"
+
+dubbo:
+  application:
+    name: dubbo-consumer
+  registry:
+    address: zookeeper:2181
+    protocol: zookeeper
+    check: false
+  monitor:
+    protocol: register
+  consumer:
+    check:  false
+    timeout: 3000

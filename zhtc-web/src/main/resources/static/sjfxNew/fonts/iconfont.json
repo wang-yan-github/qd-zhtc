@@ -1,0 +1,114 @@
+{
+  "id": "3510679",
+  "name": "zhtcsjfx",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon-",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "1260",
+      "name": "好友",
+      "font_class": "haoyou",
+      "unicode": "e600",
+      "unicode_decimal": 58880
+    },
+    {
+      "icon_id": "579740",
+      "name": "用户-fill",
+      "font_class": "yonghufill",
+      "unicode": "e787",
+      "unicode_decimal": 59271
+    },
+    {
+      "icon_id": "650809",
+      "name": "用户",
+      "font_class": "yonghu",
+      "unicode": "e652",
+      "unicode_decimal": 58962
+    },
+    {
+      "icon_id": "982344",
+      "name": "充值2",
+      "font_class": "chongzhi2",
+      "unicode": "e659",
+      "unicode_decimal": 58969
+    },
+    {
+      "icon_id": "1411071",
+      "name": "27台站故障",
+      "font_class": "taizhanguzhang",
+      "unicode": "e632",
+      "unicode_decimal": 58930
+    },
+    {
+      "icon_id": "4283412",
+      "name": "充值成功",
+      "font_class": "chongzhichenggong",
+      "unicode": "e646",
+      "unicode_decimal": 58950
+    },
+    {
+      "icon_id": "4809696",
+      "name": "车辆过户",
+      "font_class": "cheliangguohu",
+      "unicode": "e603",
+      "unicode_decimal": 58883
+    },
+    {
+      "icon_id": "6211879",
+      "name": "6-2车辆",
+      "font_class": "-cheliang",
+      "unicode": "e60a",
+      "unicode_decimal": 58890
+    },
+    {
+      "icon_id": "7183024",
+      "name": "欠费金额",
+      "font_class": "qianfeijine",
+      "unicode": "e65b",
+      "unicode_decimal": 58971
+    },
+    {
+      "icon_id": "7596853",
+      "name": "24gf-userGroup2",
+      "font_class": "24gf-userGroup2",
+      "unicode": "eb2a",
+      "unicode_decimal": 60202
+    },
+    {
+      "icon_id": "7673193",
+      "name": "收费站",
+      "font_class": "shoufeizhan",
+      "unicode": "e60b",
+      "unicode_decimal": 58891
+    },
+    {
+      "icon_id": "12498355",
+      "name": "31车辆",
+      "font_class": "cheliang",
+      "unicode": "e666",
+      "unicode_decimal": 58982
+    },
+    {
+      "icon_id": "17660858",
+      "name": "计时收费",
+      "font_class": "timeCharge",
+      "unicode": "e6b5",
+      "unicode_decimal": 59061
+    },
+    {
+      "icon_id": "17739979",
+      "name": "车辆监控实心",
+      "font_class": "nav_icon_cljk_spe",
+      "unicode": "e601",
+      "unicode_decimal": 58881
+    },
+    {
+      "icon_id": "19104014",
+      "name": "首页-收费",
+      "font_class": "shoufei",
+      "unicode": "e629",
+      "unicode_decimal": 58921
+    }
+  ]
+}

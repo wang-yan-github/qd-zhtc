@@ -1,0 +1,33 @@
+#设置端口
+server:
+  port: 8888
+spring:
+    tomcat:
+      test-while-idle: true
+    application:
+      name: dubbo-provider
+logging:
+    # 保存日志文件目录路径
+    file: C:\\app.log
+    # 日志级别
+    level:
+      # 配置spring web日志级别
+      org.springframework.web: ERROR2
+dubbo:
+  application:
+    name: dubbo-provider
+  registry:
+    address: 192.168.0.170:2181
+    protocol: zookeeper
+    check: false
+  protocol:
+    name: dubbo
+    port: 30003
+  monitor:
+    protocol: register
+  consumer:
+    check: false
+    timeout: 3000
+jsdc:
+#  fileUrl: D:/upload/
+  fileUrl: E:/upload/

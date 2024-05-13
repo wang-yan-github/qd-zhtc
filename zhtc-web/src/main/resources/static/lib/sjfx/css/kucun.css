@@ -1,0 +1,24 @@
+﻿@charset "utf-8";
+.kucunbg{position:relative;border:1px solid #1c3e7b;box-shadow:inset 0 0 30px rgba(3,65,141,.6);padding:20px;height:calc(100% - 41px);box-sizing: border-box;}
+.kucun-mid-box{width:520px;margin:120px auto 0;height:calc(100% - 140px);position:relative;}
+.kucun-mid-box .yuan{width:100%;height:520px;background:url(../img/yuan1.png) no-repeat;position:absolute;top:0;left:0;z-index:1;animation:turn 5s linear infinite;}
+.kucun-mid-box .earth{width:1370px;height:100%;z-index:1;background:url(../img/mbg.png) no-repeat 50% bottom;position:absolute;bottom:-50px;left:-425px;z-index:0;}
+.kucun-mid-box .word{padding-top:200px;text-align:center;z-index:2;position:relative;}
+.kucun-mid-box .word .p1{font-size:80px;height:100px;line-height:100px;background-image:-webkit-linear-gradient(top,#fffefc,#ffcb93);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.kucun-mid-box .word .p1:after{content:"元";display:inline-block;font-size:16px;color:#fff;font-family: "微软雅黑";}
+.kucun-mid-box .word .p2{font-size:30px;background-image:-webkit-linear-gradient(top,#f4f6f9,#6e85b1);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:bold;}
+
+.kucun-left-box{width:33%;left:20px;top:100px;height:calc(100% - 110px);position:absolute;}
+.kucun-left-box .topbox{height:50%;}
+.kucun-left-box .botbox{height:calc(50% - 20px);margin-top:20px;}
+
+.kucun-right-box{width:33%;right:20px;top:100px;height:calc(100% - 120px);position:absolute;}
+.kucun-right-box .box{height:100%;}
+
+
+
+.tit{height:60px;width:100%;text-align:center;background:url(../img/guang.png) no-repeat 50% 0px;color:#00fcf9;font-size:16px;}
+
+
+
+#zzt1,#zzt2{height:calc(100% - 60px);}
