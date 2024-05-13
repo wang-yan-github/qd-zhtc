@@ -215,10 +215,10 @@
         </plugins>
     </build>
     <repositories>
-        <repository>
-            <id>maven-public</id>
-            <name>maven-public</name>
-            <url>http://maven.aliyun.com/nexus/content/groups/public/</url>
-        </repository>
+<!--        <repository>-->
+<!--            <id>maven-public</id>-->
+<!--            <name>maven-public</name>-->
+<!--            <url>http://maven.aliyun.com/nexus/content/groups/public/</url>-->
+<!--        </repository>-->
     </repositories>
 </project>
