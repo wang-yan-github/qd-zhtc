@@ -4,20 +4,6 @@
             <div class="handle-box">
                 <div class="left-panel">
                     <el-form inline label-width="80" size="small" class="lineH0">
-                        <el-form-item label="市区">
-                            <el-select clearable v-model="query.areaId" filterable size="small" placeholder="所有区域"
-                                       class="w100" @change="getStreet">
-                                <el-option v-for="item in formqjl.areas" :key="item.id" :label="item.area_name"
-                                           :value="item.id"></el-option>
-                            </el-select>
-                        </el-form-item>
-                        <el-form-item label="街道">
-                            <el-select clearable v-model="query.streetId" filterable size="small" placeholder="所有街道"
-                                       class="w100" @change="getPark">
-                                <el-option v-for="item in formqjl.streets" :key="item.value" :label="item.street_name"
-                                           :value="item.id"></el-option>
-                            </el-select>
-                        </el-form-item>
                         <el-form-item label="停车场">
                             <el-select clearable v-model="query.placeId" filterable size="small" placeholder="所有停车场"
                                        class="w100">

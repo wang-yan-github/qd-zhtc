@@ -40,6 +40,48 @@ public class CacheDataService {
     @Autowired
     private ChargeTimeConfigService chargeTimeConfigService;
 
+    /**
+     * 缓存数据初始化
+     */
+    public void dataInit(){
+        //字典初始化
+        dictInit();
+        //停车场
+        parkInit();
+        //路段、停车场收费方案
+        parkChargeInit();
+    }
+
+    /**
+     * 字典初始化
+     */
+    public void dictInit(){
+        List<SysDict> sysDicts = sysDictService.selectList(new QueryWrapper<SysDict>().eq("is_del","0"));
+        Map<String, HashMap> dicData = new HashMap<>();
+        sysDicts.forEach(x->{
+            if(dicData.containsKey(x.getDict_type())){
+                HashMap hashMap = dicData.get(x.getDict_type());
+                hashMap.put(x.getDc_value(),x);
+            }else{
+                HashMap hashMap = new HashMap();
+                hashMap.put(x.getDc_value(),x);
+                dicData.put(x.getDict_type(),hashMap);
+            }
+        });
+        RedisUtils.setBeanValue("dictData",dicData);
+    }
+
+    /**
+     * 停车场
+     */
+    public void parkInit(){
+        List<Park> parks = parkService.selectList(new QueryWrapper<Park>().eq("is_del","0"));
+        HashMap hashMap = new HashMap();
+        parks.forEach(x->{
+            hashMap.put(x.getId(),x);
+        });
+        RedisUtils.setBeanValue("parkData",hashMap);
+    }
 
     /**
      * 更新字典缓存
@@ -145,5 +187,42 @@ public class CacheDataService {
         RedisUtils.setBeanValue("parkCharge",parkCharge);
     }
 
+
+    /**
+     * 路段、停车场 收费方案
+     */
+    public void parkChargeInit(){
+        //获取收费方案
+        List<ChargeProgramme> chargeProgrammes = chargeProgrammeService.selectList(new QueryWrapper<ChargeProgramme>().eq("is_del",0));
+        HashMap chargeMap = new HashMap();
+        if(chargeProgrammes != null && chargeProgrammes.size()>0){
+            for (ChargeProgramme cp : chargeProgrammes) {
+                //白天收费方案
+                ChargeIntervalConfig dayConfig = chargeIntervalConfigService.selectById(cp.getDay_interval_config_id());
+                List<ChargeTimeConfig> day_chargeTimeConfigs = chargeTimeConfigService.selectList(new QueryWrapper<ChargeTimeConfig>().eq("is_del","0").eq("interval_config_id",dayConfig.getId()));
+                dayConfig.setChargeTimeConfigs(day_chargeTimeConfigs);
+                //夜间收费方案
+                ChargeIntervalConfig nightConfig = chargeIntervalConfigService.selectById(cp.getNight_interval_config_id());
+                List<ChargeTimeConfig> night_chargeTimeConfigs = chargeTimeConfigService.selectList(new QueryWrapper<ChargeTimeConfig>().eq("is_del","0").eq("interval_config_id",nightConfig.getId()));
+                nightConfig.setChargeTimeConfigs(night_chargeTimeConfigs);
+                ChargeVo chargeVo = new ChargeVo(cp,dayConfig,nightConfig);
+                chargeMap.put(cp.getId(),chargeVo);
+            }
+        }
+        HashMap parkCharge = new HashMap();
+        //停车场数据
+        List<Park> parks = parkService.selectList(new QueryWrapper<Park>().eq("is_del","0"));
+        for (Park park : parks) {
+            //路段 停车方案绑定
+            //普牌（蓝牌）
+            parkCharge.put(park.getId()+"1"+ ChargeTypeEnum.BLUE.getValue(),chargeMap.get(park.getBlue_charge_id()));
+            //绿牌(绿牌)
+            parkCharge.put(park.getId()+"1"+ChargeTypeEnum.GREEN.getValue(),chargeMap.get(park.getGreen_charge_id()));
+            //大车(黄牌)
+            parkCharge.put(park.getId()+"1"+ChargeTypeEnum.YELLOW.getValue(),chargeMap.get(park.getYellow_charge_id()));
+        }
+        //路段收费方案
+        RedisUtils.setBeanValue("parkCharge",parkCharge);
+    }
 
 }

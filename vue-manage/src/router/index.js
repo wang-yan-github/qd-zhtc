@@ -326,47 +326,12 @@ const routes = [
                 },
                 component: () => import("../views/tcmana/areaList.vue")
             }, {
-                path: "/streelist",
-                name: "streelist",
-                meta: {
-                    title: '街道列表'
-                },
-                component: () => import("../views/tcmana/streeList.vue")
-            }, {
-                path: "/roadedit",
-                name: "roadedit",
-                meta: {
-                    title: '路内编辑'
-                },
-                component: () => import("../views/tcmana/roadEdit.vue")
-            }, {
-                path: "/roadlist",
-                name: "roadlist",
-                meta: {
-                    title: '路内列表'
-                },
-                component: () => import("../views/tcmana/roadList.vue")
-            }, {
-                path: "/roadmergelist",
-                name: "roadmergelist",
-                meta: {
-                    title: '路段合并管理'
-                },
-                component: () => import("../views/tcmana/roadmergelist.vue")
-            }, {
                 path: "/roadposition",
                 name: "roadposition",
                 meta: {
                     title: '车位坐标'
                 },
                 component: () => import("../views/tcmana/roadPosition.vue")
-            }, {
-                path: "/equipmentlist",
-                name: "equipmentlist",
-                meta: {
-                    title: '路内设备列表'
-                },
-                component: () => import("../views/tcmana/equipmentList.vue")
             }, {
                 path: "/equipmentedit",
                 name: "equipmentedit",

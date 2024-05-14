@@ -58,42 +58,7 @@
               <el-option value="2" label="使用中"></el-option>
               <el-option value="3" label="异常"></el-option>
             </el-select>
-            <span class="dispinline ml5"></span>
-            <el-select
-              v-model="query.area_id"
-              filterable
-              size="small"
-              clearable
-              placeholder="所有区域"
-              class="w100"
-              @change="getStreetList('a')"
-            >
-              <el-option value="">全部</el-option>
-              <el-option
-                v-for="(item, i) in result.area_list"
-                :key="i"
-                :label="item.area_name"
-                :value="item.id"
-              ></el-option>
-            </el-select>
-            <span class="dispinline ml5"></span>
-            <el-select
-              v-model="query.street_id"
-              filterable
-              size="small"
-              clearable
-              placeholder="所有街道"
-              class="w100"
-              @change="getParkList('a')"
-            >
-              <el-option value="">全部</el-option>
-              <el-option
-                v-for="(item, i) in result.query_street_list"
-                :key="i"
-                :label="item.street_name"
-                :value="item.id"
-              ></el-option>
-            </el-select>
+
             <span class="dispinline ml5"></span>
             <el-select
               v-model="query.park_id"
