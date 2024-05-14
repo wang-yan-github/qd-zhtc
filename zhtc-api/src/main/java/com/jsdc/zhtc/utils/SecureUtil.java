@@ -15,15 +15,27 @@
 package com.jsdc.zhtc.utils;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.http.Consts;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.EntityUtils;
 import org.bouncycastle.crypto.digests.SM3Digest;
 
 import javax.crypto.Cipher;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.security.MessageDigest;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.security.Signature;
+import java.security.*;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @ClassName SecureUtil
@@ -532,5 +544,167 @@ public class SecureUtil {
             check = 0;
         }
         return check;
+    }
+
+
+
+    /**
+     * @description:公钥(平台公钥)加密。因为对数据填充padding的原因，每次加密的结果不一样
+     * @author wzn
+     * @date 2024/5/13 17:08
+     */
+
+    public static String rsaEncryptPublicKey(String data, String serverPublicKey) {
+        try {
+            byte[] decode = java.util.Base64.getDecoder().decode(serverPublicKey);
+            X509EncodedKeySpec x509EncodedKeySpec = new X509EncodedKeySpec(decode);
+            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+            PublicKey generatePublic = keyFactory.generatePublic(x509EncodedKeySpec);
+            Cipher cipher = Cipher.getInstance(keyFactory.getAlgorithm());;
+            cipher.init(Cipher.ENCRYPT_MODE, generatePublic);
+
+            // 加密字符串超过117时循环处理
+            byte[] bytes = data.getBytes("UTF-8");
+            int inputLen = bytes.length;
+            int offLen = 0; // 偏移量
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            while(inputLen - offLen > 0){
+                byte [] cache;
+                if(inputLen - offLen > 117){
+                    cache = cipher.doFinal(bytes, offLen, 117);
+                } else{
+                    cache = cipher.doFinal(bytes, offLen, inputLen - offLen);
+                }
+                outputStream.write(cache);
+                offLen += 117;
+            }
+            outputStream.close();
+            byte[] encryptedData = outputStream.toByteArray();
+            String encodeToString = java.util.Base64.getEncoder().encodeToString(encryptedData);
+            return encodeToString;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
+
+
+
+    /**
+     * @description:私钥(用户私钥)签名
+     * @author wzn
+     * @date 2024/5/13 17:08
+     */
+    public static String rsaDecryptPrivateKey(String data, String privateKey) {
+        String result = "";
+        try {
+            java.util.Base64.Decoder decoder = java.util.Base64.getDecoder();
+            byte[] decode = decoder.decode(privateKey);
+            PKCS8EncodedKeySpec pkcs8EncodedKeySpec = new PKCS8EncodedKeySpec(decode); // 私钥用PKCS8EncodedKeySpec
+            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+            PrivateKey generatePrivate = keyFactory.generatePrivate(pkcs8EncodedKeySpec);
+            Cipher cipher = Cipher.getInstance(keyFactory.getAlgorithm());;
+            cipher.init(Cipher.DECRYPT_MODE, generatePrivate);
+
+            byte[] bytes = decoder.decode(data) ;
+            int inputLen = bytes.length;
+            int offLen = 0;
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            // 128解密
+            while(inputLen - offLen > 0){
+                byte[] cache;
+                if(inputLen - offLen > 128){
+                    cache = cipher.doFinal(bytes, offLen, 128);
+                }else{
+                    cache = cipher.doFinal(bytes, offLen, inputLen - offLen);
+                }
+                byteArrayOutputStream.write(cache);
+                offLen += 128;
+            }
+            byteArrayOutputStream.close();
+            byte[] byteArray = byteArrayOutputStream.toByteArray();
+            result = new String(byteArray, "UTF-8");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+
+
+    /**
+     * @description:公钥(平台公钥)验签
+     * @author wzn
+     * @date 2024/5/13 17:09
+     */
+
+    public static boolean doCheck(String content, String sign, String serverPublicKey) {
+        try {
+            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+            byte[] encodedKey = java.util.Base64.getDecoder().decode(serverPublicKey);
+            PublicKey pubKey = keyFactory.generatePublic(new X509EncodedKeySpec(encodedKey));
+            java.security.Signature signature = java.security.Signature.getInstance("SHA1WithRSA");
+
+            signature.initVerify(pubKey);
+            signature.update(content.getBytes("UTF-8"));
+            boolean bverify = signature.verify(java.util.Base64.getDecoder().decode(sign));
+            return bverify;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+
+    public static String doPost(String url, Map<String,String> param) {
+        // 创建Httpclient对象
+        CloseableHttpClient httpClient = HttpClients.createDefault();
+        CloseableHttpResponse response = null;
+        String resultString = "";
+        try {
+            // 创建Http Post请求
+            HttpPost httpPost = new HttpPost(url);
+            // 创建参数列表
+            if (param != null) {
+                List<NameValuePair> paramList = new ArrayList<>() ;
+                for (String key : param.keySet()) {
+                    paramList.add(new BasicNameValuePair(key, param.get(key)));
+                }
+                // 模拟表单
+                UrlEncodedFormEntity entity = new UrlEncodedFormEntity(paramList, Consts.UTF_8);
+                httpPost.setEntity(entity);
+            }
+            // 执行http请求
+            response = httpClient.execute(httpPost);
+            resultString = EntityUtils.toString(response.getEntity(), "utf-8");
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (response != null) {
+                    response.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return resultString;
+    }
+
+
+    public static String sign(String content, String privateKey) {
+        try {
+            PKCS8EncodedKeySpec priPKCS8 = new PKCS8EncodedKeySpec(java.util.Base64.getDecoder().decode(privateKey));
+            KeyFactory keyf = KeyFactory.getInstance("RSA");
+            PrivateKey priKey = keyf.generatePrivate(priPKCS8);
+            java.security.Signature signature = java.security.Signature.getInstance("SHA1WithRSA");
+            signature.initSign(priKey);
+            signature.update(content.getBytes("UTF-8"));
+            byte[] signed = signature.sign();
+            return java.util.Base64.getEncoder().encodeToString(signed);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "";
     }
 }

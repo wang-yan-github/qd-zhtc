@@ -1,12 +1,17 @@
 package com.jsdc.zhtc.service;
 
-import com.jsdc.zhtc.model.SysDict;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.jsdc.zhtc.common.constants.GlobalData;
+import com.jsdc.zhtc.enums.ChargeTypeEnum;
+import com.jsdc.zhtc.model.*;
 import com.jsdc.zhtc.utils.RedisUtils;
+import com.jsdc.zhtc.vo.ChargeVo;
 import com.jsdc.zhtc.vo.ResultInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -22,14 +27,18 @@ public class CacheDataService {
 
     @Autowired
     private SysDictService sysDictService;
-    @Autowired
-    private AreaService areaService;
-    @Autowired
-    private StreetService streetService;
 
 
     @Autowired
     private ParkService parkService;
+
+    @Autowired
+    private ChargeProgrammeService chargeProgrammeService;
+
+    @Autowired
+    private ChargeIntervalConfigService chargeIntervalConfigService;
+    @Autowired
+    private ChargeTimeConfigService chargeTimeConfigService;
 
 
     /**
@@ -63,6 +72,77 @@ public class CacheDataService {
         }
 
         return ResultInfo.success();
+    }
+
+
+    /**
+     *  更新区域、街道、路段、停车场缓存数据
+     * @param o
+     * @return
+     */
+    public ResultInfo updateLocationCache(Object o){
+        if(o == null) ResultInfo.error("更新对象为空！");
+        try{
+            if(o instanceof Park){
+                HashMap parkMap = (HashMap) RedisUtils.getBeanValue("parkData");
+                Park park = (Park) o;
+                if("1".equals(park.getIs_del())){
+                    parkMap.remove(park.getId(),park);
+                }else{
+                    parkMap.put(park.getId(),park);
+                }
+                RedisUtils.setBeanValue("parkData",parkMap);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            return ResultInfo.error("字典更新失败！");
+        }
+        return ResultInfo.success();
+    }
+
+
+    /**
+     * 路段、停车场 收费方案缓存更新
+     */
+    public void updChargeByRoad_ParkId(Integer parkId){
+        //获取收费方案
+        List<ChargeProgramme> chargeProgrammes = chargeProgrammeService.selectList(new QueryWrapper<ChargeProgramme>().eq("is_del",0));
+        HashMap chargeMap = new HashMap();
+        if(chargeProgrammes != null && chargeProgrammes.size()>0){
+            for (ChargeProgramme cp : chargeProgrammes) {
+                //白天收费方案
+                ChargeIntervalConfig dayConfig = chargeIntervalConfigService.selectById(cp.getDay_interval_config_id());
+                List<ChargeTimeConfig> day_chargeTimeConfigs = chargeTimeConfigService.selectList(new QueryWrapper<ChargeTimeConfig>().eq("is_del","0").eq("interval_config_id",dayConfig.getId()));
+                dayConfig.setChargeTimeConfigs(day_chargeTimeConfigs);
+                //夜间收费方案
+                ChargeIntervalConfig nightConfig = chargeIntervalConfigService.selectById(cp.getNight_interval_config_id());
+                List<ChargeTimeConfig> night_chargeTimeConfigs = chargeTimeConfigService.selectList(new QueryWrapper<ChargeTimeConfig>().eq("is_del","0").eq("interval_config_id",nightConfig.getId()));
+                nightConfig.setChargeTimeConfigs(night_chargeTimeConfigs);
+                ChargeVo chargeVo = new ChargeVo(cp,dayConfig,nightConfig);
+                chargeMap.put(cp.getId(),chargeVo);
+            }
+        }
+        //获取当前缓存
+        HashMap parkCharge = (HashMap) RedisUtils.getBeanValue("parkCharge");
+        //获取路段数据
+       if(parkId != null){
+            Park park = parkService.selectById(parkId);
+            if(park!=null && GlobalData.ISDEL_NO.equals(park.getIs_del())){
+                //停车方案绑定
+                //普牌（蓝牌）
+                parkCharge.put(park.getId()+"1"+ ChargeTypeEnum.BLUE.getValue(),chargeMap.get(park.getBlue_charge_id()));
+                //绿牌(绿牌)
+                parkCharge.put(park.getId()+"1"+ChargeTypeEnum.GREEN.getValue(),chargeMap.get(park.getGreen_charge_id()));
+                //大车(黄牌)
+                parkCharge.put(park.getId()+"1"+ChargeTypeEnum.YELLOW.getValue(),chargeMap.get(park.getYellow_charge_id()));
+            }else{
+                parkCharge.remove(park.getId()+"1"+ ChargeTypeEnum.BLUE.getValue());
+                parkCharge.remove(park.getId()+"1"+ ChargeTypeEnum.GREEN.getValue());
+                parkCharge.remove(park.getId()+"1"+ ChargeTypeEnum.YELLOW.getValue());
+            }
+        }
+        //路段收费方案
+        RedisUtils.setBeanValue("parkCharge",parkCharge);
     }
 
 

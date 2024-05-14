@@ -1,12 +1,8 @@
 package com.jsdc.zhtc.utils;
 
-import com.jsdc.zhtc.model.Area;
 import com.jsdc.zhtc.model.Park;
-import com.jsdc.zhtc.model.Street;
 import com.jsdc.zhtc.model.SysDict;
-import com.jsdc.zhtc.vo.AreaVo;
 import com.jsdc.zhtc.vo.ChargeVo;
-import com.jsdc.zhtc.vo.TreeStructureVo;
 
 import java.util.*;
 
@@ -51,25 +47,6 @@ public class DcCacheDataUtil {
         return dictMap;
     }
 
-    /**
-     * 获取区域的map对象，可根据区域ID作为key获取区域信息
-     *
-     * @return
-     */
-    public static HashMap<Integer, Area> getMapAreas() {
-        HashMap<Integer, Area> areaMap = (HashMap<Integer, Area>) RedisUtils.getBeanValue("areaData");
-        return areaMap;
-    }
-
-    /**
-     * 获取街道的map对象，可根据街道ID作为key获取街道信息
-     *
-     * @return
-     */
-    public static HashMap<Integer, Street> getMapStreets() {
-        HashMap<Integer, Street> streetMap = (HashMap<Integer, Street>) RedisUtils.getBeanValue("streetData");
-        return streetMap;
-    }
 
     /**
      * 获取停车场的map对象，可根据停车场ID作为key获取停车场信息
@@ -81,35 +58,6 @@ public class DcCacheDataUtil {
         return parkMap;
     }
 
-    /**
-     * 获取所有区域信息
-     *
-     * @return
-     */
-    public static List<Area> getAllAreas() {
-        List<Area> areaList = new ArrayList<>();
-        HashMap<Integer, Area> areaMap = (HashMap<Integer, Area>) RedisUtils.getBeanValue("areaData");
-        Iterator iterator = areaMap.values().iterator();
-        while (iterator.hasNext()) {
-            areaList.add((Area) iterator.next());
-        }
-        return areaList;
-    }
-
-    /**
-     * 获取所有街道信息
-     *
-     * @return
-     */
-    public static List<Street> getAllStreets() {
-        List<Street> streetList = new ArrayList<>();
-        HashMap<Integer, Street> streetMap = (HashMap<Integer, Street>) RedisUtils.getBeanValue("streetData");
-        Iterator iterator = streetMap.values().iterator();
-        while (iterator.hasNext()) {
-            streetList.add((Street) iterator.next());
-        }
-        return streetList;
-    }
 
     /**
      * 获取所有停车场信息
@@ -144,15 +92,4 @@ public class DcCacheDataUtil {
         }
     }
 
-    /**
-     * 描 述： TODO( 获取区 街道 路段树形结构)
-     * 作 者： lw
-     * 历 史： (版本) 作者 时间 注释
-     *
-     * @return {@link List< AreaVo>}
-     */
-    public static List<TreeStructureVo> getTreeStructure() {
-        List<TreeStructureVo> lists = (List<TreeStructureVo>) RedisUtils.getBeanValue("treeStructure");
-        return lists;
-    }
 }

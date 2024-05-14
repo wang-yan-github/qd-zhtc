@@ -55,7 +55,7 @@ public class Park extends Model<Park> implements Serializable {
     // 泊位总数
     private Integer park_num;
 
-    //停车场等级 1.核心区 2.一类区 3.二类区 4.三类区
+    //停车场类型 1.急诊区域
     private String park_grade;
 
     // 城市
@@ -138,6 +138,12 @@ public class Park extends Model<Park> implements Serializable {
         if (StringUtils.isNotBlank(latitude))
             this.latitude = latitude;
     }
+
+    //急诊区域 时长类型 1日 2月 3年
+    private Integer timeType ;
+
+    //急诊区域 累计停车时长
+    private Integer cumulativeDuration ;
 
 
 }

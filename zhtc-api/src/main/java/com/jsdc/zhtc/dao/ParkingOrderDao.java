@@ -855,13 +855,13 @@ public class ParkingOrderDao extends BaseDao<ParkingOrder> {
      * @param:RoadParkListVo
      */
     public String selectWXPage(RoadParkListVo bean) {
-        String sql = "select * from road_park_list where 1=1 ";
+        String sql = "select * from parking_order where 1=1 ";
         if (notEmpty(bean)) {
             if (notEmpty(bean.getUserType()) && GlobalData.PARKING_TYPE_PLAT.equals(bean.getUserType())) {
-                sql += " and pId = '" + bean.getId() + "'";
+                sql += " and park_id = '" + bean.getId() + "'";
             }
             if (null != bean.getPlaceId()) {
-                sql += " and placeId = '" + bean.getPlaceId() + "'";
+                sql += " and park_id = '" + bean.getPlaceId() + "'";
             }
             if (notEmpty(bean.getStatus())) {
                 if (!"0".equals(bean.getStatus())) {
@@ -870,9 +870,6 @@ public class ParkingOrderDao extends BaseDao<ParkingOrder> {
             }
             if (notEmpty(bean.getFree_type())) {
                 sql += " and free_type = '" + bean.getFree_type() + "'";
-            }
-            if (notEmpty(bean.getType())) {
-                sql += " and type = '" + bean.getType() + "'";
             }
             if (notEmpty(bean.getAppeal_status())) {
                 sql += " and appeal_status = '" + bean.getAppeal_status() + "'";
@@ -886,21 +883,21 @@ public class ParkingOrderDao extends BaseDao<ParkingOrder> {
                 for (Integer car : car_list) {
                     num++;
                     if (num == 1) {
-                        sql += "and ( carId = '" + car + "' ";
+                        sql += "and ( carno_id = '" + car + "' ";
                     } else {
-                        sql += " or carId = '" + car + "' ";
+                        sql += " or carno_id = '" + car + "' ";
                     }
                 }
                 sql += " ) ";
             }
             if (notEmpty(bean.getCarNo())) {
-                sql += " and carNo like '%" + bean.getCarNo() + "%'";
+                sql += " and car_no like '%" + bean.getCarNo() + "%'";
             }
             if (notEmpty(bean.getBerth())) {
                 sql += " and berth like '%" + bean.getBerth() + "%'";
             }
             if (notEmpty(bean.getOrderNo())) {
-                sql += " and orderNo like '%" + bean.getOrderNo() + "%'";
+                sql += " and order_no like '%" + bean.getOrderNo() + "%'";
             }
             if (notEmpty(bean.getPhone())) {
                 sql += " and phone like '%" + bean.getPhone() + "%'";
@@ -913,21 +910,21 @@ public class ParkingOrderDao extends BaseDao<ParkingOrder> {
             }*/
             if (notEmpty(bean.getStartTime())) {
                 String s = bean.getStartTime().substring(0, 10) + " 00:00:00";
-                sql += " and driveinTime >= '" + s + "'";
+                sql += " and drivein_time >= '" + s + "'";
             }
             if (notEmpty(bean.getEndTime())) {
                 String e = bean.getEndTime().substring(0, 10) + " 23:59:59";
-                sql += " and driveinTime <= '" + e + "'";
+                sql += " and drivein_time <= '" + e + "'";
             }
             if (notEmpty(bean.getMember_id())) {
                 sql += " and member_id = '" + bean.getMember_id() + "'";
             }
             if (notEmpty(bean.getIs_discount())) {
-                sql += " and is_discount = '" + bean.getIs_discount() + "'";
+                    sql += " and is_discount = '" + bean.getIs_discount() + "'";
             }
             //二次识别
             if (notEmpty(bean.getChecked2()) && "true".equals(bean.getChecked2())) {
-                sql += " and status in ('1','2') and carId2 is not null and carId != carId2";
+                sql += " and status in ('1','2')";
             }
             if (null != bean.getCarno_list() && bean.getCarno_list().size() > 0 && null != bean.getCarno_list()) {
                 List<String> car_list = bean.getCarno_list();
@@ -935,15 +932,15 @@ public class ParkingOrderDao extends BaseDao<ParkingOrder> {
                 for (String car : car_list) {
                     num++;
                     if (num == 1) {
-                        sql += "and ( carNo = '" + car + "' ";
+                        sql += "and ( car_no = '" + car + "' ";
                     } else {
-                        sql += " or carNo = '" + car + "' ";
+                        sql += " or car_no = '" + car + "' ";
                     }
                 }
                 sql += " ) ";
             }
         }
-        sql += " ORDER BY status,driveinTime desc";
+        sql += " ORDER BY status,drivein_time desc";
         return getQueryHandler(sql).getSql();
     }
 

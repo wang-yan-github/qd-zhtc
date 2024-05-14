@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -46,6 +47,7 @@ public class ParkController extends BaseController {
     @Autowired
     private TrafficControlUtils trafficControlUtils;
 
+
     Logger logger = LoggerFactory.getLogger(ParkController.class);
 
     /**
@@ -67,6 +69,37 @@ public class ParkController extends BaseController {
 
         return ResultInfo.success(page);
     }
+
+
+    /**
+     * 添加停车场
+     *
+     * @param park
+     * @return
+     * @author bn
+     */
+    @RequestMapping(value = "toAdd.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ResultInfo toAdd(Park park) {
+        park.setIs_del("0");
+        park.setStatus("0");
+        //限流开关 0开启 1关闭
+        park.setOn_off("1");
+        park.setCreate_time(new Date());
+        park.setCreate_user(sysUserService.getUser().getId());
+
+        //上报交控
+
+
+        parkService.insert(park);
+        cacheDataService.updateLocationCache(park);
+        cacheDataService.updChargeByRoad_ParkId(park.getId());
+
+        String msg = "添加成功";
+
+        return ResultInfo.successMsg(msg);
+    }
+
 
 
     /**
