@@ -59,7 +59,7 @@ spring:
   #redis配置
   redis:
     database: 4
-    host: 172.168.95.9
+    host: redis
     password: 111111
     port: 6379
     jedis:
@@ -105,7 +105,7 @@ mybatis-plus:
 
 logging:
   # 保存日志文件目录路径
-  file: C:/logs/log.log
+  file: /Users/wangyan/Desktop/logs/log.log
   # 日志级别
   level:
     # 配置spring web日志级别
@@ -131,12 +131,12 @@ jsdc:
   h5StreamServerUrl : http://localhost:9988/
   streamLoginName : admin
   streamLoginPwd : 827ccb0eea8a706c4c34a16891f84e7b
-  filePath: C:/file/
+  filePath: /Users/wangyan/Desktop/file/
   loadPicPath: http://127.0.0.1:8080/fileManage/getImgView.do?id=
 #  loadPicPath2: http://211.103.125.189:9053/
 #  loadPicPath2: http://192.168.0.93:82/
   loadPicPath2: http://192.168.0.104:8010/
-  fileUrl: C:/posapk/
+  fileUrl: /Users/wangyan/Desktop/posapk/
   #车牌识别服务url
   uploadUrl: http://127.0.0.1:8866/getCarnoByImage
   #车牌识别上传图片旋转90度后生成文件路径
@@ -165,7 +165,7 @@ jsdc:
 jpush:
   app_key: 8f02a4fa717a6235734d92de
   master_secret: cf6de29f9e66432ba4ac1c32
-excel-export-path: C:/excel/
+excel-export-path: /Users/wangyan/Desktop/excel/
 
 #支付地址
 paymentOrder:
@@ -183,7 +183,7 @@ file_review_url:
 program_url:
   http://192.168.0.172:8020/
 
-program_path: E:/upload
+program_path: /Users/wangyan/Desktop/upload
 
 qrcode_url: http://tctest.aldwxa.top
 
