@@ -51,7 +51,7 @@ maven package:
   image: maven:3.6.3-jdk-8-slim
   stage: maven package
   only:
-    - master
+    - build
   script:
     - echo "=============== 开始编译任务  ==============="
     - ls -l
@@ -65,7 +65,7 @@ deploy jar:
   image: docker
   stage: deploy jar
   only:
-    - master
+    - build
   script:
     - echo "=============== 开始部署任务  ==============="
     - cd $API_PATH
@@ -92,7 +92,7 @@ maven mqtt package:
   image: maven:3.6.3-jdk-8-slim
   stage: maven mqtt package
   only:
-    - master
+    - build
   script:
     - echo "=============== 开始编译任务  ==============="
     - ls -l
@@ -106,7 +106,7 @@ deploy mqtt jar:
   image: docker
   stage: deploy mqtt jar
   only:
-    - master
+    - build
   script:
     - echo "=============== 开始部署任务  ==============="
     - cd $API_MQTT_PATH
@@ -133,7 +133,7 @@ build vue:
   image: node:16.20-alpine
   stage: build vue
   only:
-    - master
+    - build
   script:
     - echo "=============== 开始打包任务  ==============="
     - cd $WEB_PATH
@@ -148,7 +148,7 @@ deploy vue:
   image: docker
   stage: deploy vue
   only:
-    - master
+    - build
   script:
     - echo "=============== 开始部署任务  ==============="
     - cd $WEB_PATH
