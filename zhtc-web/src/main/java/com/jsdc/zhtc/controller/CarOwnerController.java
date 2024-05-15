@@ -8,6 +8,7 @@ import com.jsdc.zhtc.vo.ResultInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * 车主管理
@@ -71,4 +72,15 @@ public class CarOwnerController {
         return json;
     }
 
+    /**
+     * 车牌管理模板导入
+     *
+     * @throws IOException
+     */
+    @RequestMapping("/templateImport")
+    @ResponseBody
+    public ResultInfo templateImport(MultipartFile file){
+        ResultInfo json = service.templateImport(file);
+        return json;
+    }
 }
