@@ -38,6 +38,7 @@ maven install:
   stage: maven install
   only:
     - install
+    - maven install
   script:
     - echo "=============== 开始编译任务  ==============="
     - ls -l
@@ -79,6 +80,7 @@ maven mqtt install:
   stage: maven mqtt install
   only:
     - install
+    - maven mqtt install
   script:
     - echo "=============== 开始编译任务  ==============="
     - ls -l
@@ -120,12 +122,13 @@ npm install:
   stage: npm install
   only:
     - install
+    - npm install
   script:
     - echo "=============== 开始安装任务  ==============="
     - cd $WEB_PATH
     - ls -l
     #安装 canvas插件依赖库
-    - RUN apk add --no-cache \
+    - apk add --no-cache \
       build-base \
       cairo-dev \
       pango-dev \
