@@ -1,4 +1,4 @@
 #NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
 #Wed May 15 14:33:28 CST 2024
-guava-10.0.1.pom>wangyan_group=
-guava-10.0.1.jar>wangyan_group=
+google-collections-1.0.pom>wangyan_group=
+google-collections-1.0.jar>wangyan_group=

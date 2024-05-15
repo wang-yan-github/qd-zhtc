@@ -10,7 +10,7 @@ spring:
   #数据源
   datasource:
     # url: jdbc:sqlserver://211.103.125.189:1433;DatabaseName=zhtc_project
-    url: jdbc:sqlserver://172.168.95.9:1433;DatabaseName=zhtc_qd
+    url: jdbc:sqlserver://sqlserver:1433;DatabaseName=zhtc_qd
     username: sa
     password: rjgs@2016
     driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
