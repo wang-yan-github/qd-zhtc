@@ -47,8 +47,6 @@ public class CarnoCompanyService extends BaseService<CarnoCompanyDao, CarnoCompa
     @Autowired
     private OperateCarnoService operateCarnoService;
     @Autowired
-    private MemberManageService memberManageService;
-    @Autowired
     private MonthlyManagementService monthlyManagementService;
     @Autowired
     private SysUserService sysUserService;

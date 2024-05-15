@@ -66,8 +66,6 @@ public class MonthlyManagementService extends BaseService<MonthlyManagementDao, 
     @Autowired
     private PaymentOrderService paymentOrderService;
     @Autowired
-    private MemberManageService memberManageService;
-    @Autowired
     private MonthlyPaymentRecordService monthlyPaymentRecordService;
     @Autowired
     private WxPayConfigService configService;

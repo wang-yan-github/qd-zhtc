@@ -5,10 +5,8 @@ import com.github.pagehelper.PageInfo;
 import com.jsdc.core.base.BaseController;
 import com.jsdc.zhtc.common.aop.logaop.LogInfo;
 import com.jsdc.zhtc.enums.LogEnums;
-import com.jsdc.zhtc.model.MemberManage;
 import com.jsdc.zhtc.model.OperateCarno;
 import com.jsdc.zhtc.model.SysDict;
-import com.jsdc.zhtc.service.MemberManageService;
 import com.jsdc.zhtc.service.OperateCarnoService;
 import com.jsdc.zhtc.utils.DcCacheDataUtil;
 import com.jsdc.zhtc.vo.BatchAddWhiteCarno;
@@ -41,8 +39,6 @@ public class OperateCarnoController extends BaseController {
 
     @Autowired
     private OperateCarnoService carnoService;
-    @Autowired
-    private MemberManageService memberManageService;
 
     @PostMapping("/getMemberAll")
     @ResponseBody
@@ -153,12 +149,7 @@ public class OperateCarnoController extends BaseController {
             HashMap<String, SysDict> dictRtMap = DcCacheDataUtil.getMapDicts("rosterType");
             operateCarnoVo.setCarTypeName(dictCtMap.get(operateCarno.getCar_type()).getLabel());
             operateCarnoVo.setRosterTypeName(dictRtMap.get(operateCarno.getRoster_type()).getLabel());
-            if (operateCarno.getMember_id() != null) {
-                //获取用户
-                MemberManage memberManage = memberManageService.selectById(operateCarno.getMember_id());
-                if (memberManage != null)
-                    operateCarnoVo.setMemberName(memberManage.getNick_name());
-            }
+
         } else {
             return ResultInfo.error("无此车牌信息，请先录入车牌信息！");
         }
@@ -190,10 +181,6 @@ public class OperateCarnoController extends BaseController {
      */
     @PostMapping("/saveData")
     public ResultInfo saveData(@RequestBody OperateCarno bean) {
-        MemberManage inspecter = memberManageService.getInspecter();
-        if (inspecter.getId() == null || inspecter.getId() <= 0)
-            return ResultInfo.error("error", "请先登录用户");
-        bean.setMember_id(inspecter.getId());
         return carnoService.saveData(bean);
     }
 

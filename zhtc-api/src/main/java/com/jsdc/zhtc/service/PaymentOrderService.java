@@ -50,8 +50,6 @@ public class PaymentOrderService extends BaseService<PaymentOrderDao, PaymentOrd
     @Autowired
     private InspectManageService manageService;
     @Autowired
-    private MemberManageService memberManageService;
-    @Autowired
     private WxPay wxPay;
     @Autowired
     private WxPayConfigService configService;

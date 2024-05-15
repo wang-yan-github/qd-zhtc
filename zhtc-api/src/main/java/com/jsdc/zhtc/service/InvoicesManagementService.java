@@ -30,9 +30,6 @@ public class InvoicesManagementService extends BaseService<InvoicesManagementDao
     @Autowired
     InvoicesManagementMapper invoicesManagementMapper;
     @Autowired
-    MemberManageService memberManageService;
-
-    @Autowired
     private ParkingOrderService parkingOrderService;
     @Autowired
     private SysUserService sysUserService;

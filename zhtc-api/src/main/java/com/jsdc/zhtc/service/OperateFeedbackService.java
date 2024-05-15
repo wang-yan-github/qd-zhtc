@@ -43,8 +43,6 @@ public class OperateFeedbackService extends BaseService<OperateFeedbackDao, Oper
     @Autowired
     private FeedbackReplyService replyService;
     @Autowired
-    private MemberManageService manageService;
-    @Autowired
     private FileManageService fileManageService;
     @Value("${jsdc.loadPicPath2}")
     public String loadPicPath2;
@@ -115,10 +113,7 @@ public class OperateFeedbackService extends BaseService<OperateFeedbackDao, Oper
      */
     public ResultInfo detailsByFeedBack(OperateFeedback bean) {
         bean = selectById(bean.getId());
-        MemberManage memberManage = manageService.selectById(bean.getMember_id());
-        if (null != memberManage.getPhone()) {
-            bean.setTel_phone(memberManage.getPhone());
-        }
+
         QueryWrapper<FeedbackPicture> wrapper = new QueryWrapper<>();
         wrapper.eq("feedback_id", bean.getId());
         List<FeedbackPicture> piclist = feedbackPictureService.selectList(wrapper);

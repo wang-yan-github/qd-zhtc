@@ -1,6 +1,5 @@
 package com.jsdc.zhtc.controller;
 
-import com.jsdc.zhtc.service.MemberManageService;
 import com.jsdc.zhtc.service.MonthlyManagementService;
 import com.jsdc.zhtc.service.ParkingOrderService;
 import com.jsdc.zhtc.service.RechargeManagementService;
@@ -23,11 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class PlatformSurveyController {
 
     @Autowired
-    private MemberManageService memberManageService;
-
-    @Autowired
     private ParkingOrderService parkingOrderService;
-
     @Autowired
     private MonthlyManagementService monthlyManagementService;
     @Autowired
@@ -43,8 +38,7 @@ public class PlatformSurveyController {
      */
     @PostMapping("/getTodayAddCount")
     public ResultInfo getTodayAddCount() {
-        Integer todayAddCount = memberManageService.getTodayAddCount();
-        return ResultInfo.success(todayAddCount, "查询成功");
+        return ResultInfo.success("", "查询成功");
     }
 
     /**
@@ -57,8 +51,7 @@ public class PlatformSurveyController {
      */
     @PostMapping("/getMemberTotality")
     public ResultInfo getMemberTotality() {
-        Long todayAddCount = memberManageService.getMemberTotality();
-        return ResultInfo.success(todayAddCount, "查询成功");
+        return ResultInfo.success("", "查询成功");
     }
 
 

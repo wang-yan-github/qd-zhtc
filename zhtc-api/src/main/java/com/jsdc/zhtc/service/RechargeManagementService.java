@@ -54,8 +54,6 @@ public class RechargeManagementService extends BaseService<RechargeManagementDao
     @Autowired
     private RechargeManagementMapper mapper;
     @Autowired
-    private MemberManageService manageService;
-    @Autowired
     private PaymentOrderService paymentOrderService;
     @Autowired
     private RechargeManagementPicService rechargeManagementPicService;
@@ -225,8 +223,7 @@ public class RechargeManagementService extends BaseService<RechargeManagementDao
         //备注
 //         paymentOrder.setRemarks("钱包付款");
         paymentOrderService.insert(paymentOrder);
-        //更会员钱包
-        Integer count = manageService.rechargeUp(bean.getMember_id(), bean.getRecharge_amount(), "0");
+
         //增加充值记录
         bean.setRecharge_time(new Date());
         bean.setPayment_id(paymentOrder.getId());
@@ -297,9 +294,7 @@ public class RechargeManagementService extends BaseService<RechargeManagementDao
         bean.setRecharge_time(new Date());
         bean.setPayment_id(paymentOrder.getId());
         bean.setIs_del("0");
-        MemberManage memberManage = manageService.selectOne(Wrappers.<MemberManage>lambdaQuery()
-                .eq(MemberManage::getOpenid, bean.getOpenId()).eq(MemberManage::getIs_del, GlobalData.ISDEL_NO));
-        bean.setMember_id(memberManage.getId());
+
         bean.setPayment_id(paymentOrder.getId());
         bean.setIs_del(GlobalData.ISDEL_NO);
         bean.setCreate_time(new Date());
@@ -337,15 +332,8 @@ public class RechargeManagementService extends BaseService<RechargeManagementDao
             paymentOrderService.updateById(po);
             RechargeManagement rechargeManagement = selectOne(Wrappers.<RechargeManagement>lambdaQuery()
                     .eq(RechargeManagement::getPayment_id, po.getId()).eq(RechargeManagement::getIs_del, GlobalData.ISDEL_NO));
-            MemberManage memberManage = manageService.selectOne(Wrappers.<MemberManage>lambdaQuery()
-                    .eq(MemberManage::getOpenid, openid).eq(MemberManage::getIs_del, GlobalData.ISDEL_NO));
 
-            BigDecimal balance = new BigDecimal(rechargeManagement.getRecharge_amount()).add(new BigDecimal(rechargeManagement.getGift_amount()));
-            String amount = memberManage.getBalance();
-            memberManage.setBalance(new BigDecimal(amount).add(balance).toString());
-            memberManage.setUpdate_time(new Date());
-            manageService.updateById(memberManage);
-            return ResultInfo.success(memberManage);
+            return ResultInfo.success();
         } else if (org.apache.commons.lang.StringUtils.equals("CLOSED", result.getString("trade_state"))) {
             po.setStatus("3");
             po.setUpdate_time(new Date());

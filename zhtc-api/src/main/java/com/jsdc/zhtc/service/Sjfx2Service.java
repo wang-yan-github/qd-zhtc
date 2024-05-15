@@ -27,7 +27,6 @@ public class Sjfx2Service {
     @Autowired
     private ParkingOrderService parkingOrderService;
 
-
     @Autowired
     private ParkService parkService;
 
@@ -40,8 +39,6 @@ public class Sjfx2Service {
     private RechargeManagementService rechargeManagementService;
     @Autowired
     private RefundManagementService refundManagementService;
-    @Autowired
-    private MemberManageService memberManageService;
     @Autowired
     private PaymentOrderService paymentOrderService;
     @Autowired
@@ -332,29 +329,6 @@ public class Sjfx2Service {
      */
     public JSONObject getMainLeft3Data() {
         JSONObject jsonObject = new JSONObject();
-
-        //用户总数、
-        QueryWrapper<MemberManage> wrapper = new QueryWrapper<>();
-        wrapper.eq("is_del", 0);
-        Long count = memberManageService.selectCount(wrapper);
-        jsonObject.put("user_count", count);
-
-        // 今日活跃度、
-        QueryWrapper<MemberManage> wrapper2 = new QueryWrapper<>();
-        wrapper2.eq("is_del", 0);
-        wrapper2.isNotNull("openid");
-        wrapper2.eq("CONVERT(varchar, create_time, 23)", new DateTime().toString("yyyy-MM-dd"));
-        Long today_count = memberManageService.selectCount(wrapper2);
-        jsonObject.put("today_count", today_count);
-
-        // 7日活跃度（活跃度=车主表绑定openid数量）
-        QueryWrapper<MemberManage> wrapper3 = new QueryWrapper<>();
-        wrapper3.eq("is_del", 0);
-        wrapper3.isNotNull("openid");
-        wrapper3.gt("CONVERT(varchar, create_time, 23)", new DateTime().plusDays(-6).toString("yyyy-MM-dd"));
-        wrapper3.lt("CONVERT(varchar, create_time, 23)", new DateTime().toString("yyyy-MM-dd"));
-        Long days_count = memberManageService.selectCount(wrapper3);
-        jsonObject.put("days_count", days_count);
 
         //所有车牌数量
         QueryWrapper<OperateCarno> wrapper4 = new QueryWrapper<>();

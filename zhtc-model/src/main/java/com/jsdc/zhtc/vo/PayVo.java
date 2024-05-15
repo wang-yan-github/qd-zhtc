@@ -1,6 +1,5 @@
 package com.jsdc.zhtc.vo;
 
-import com.jsdc.zhtc.model.MemberManage;
 import lombok.Data;
 
 
@@ -13,8 +12,6 @@ public class PayVo {
     private Integer code;
     //支付订单id
     private Integer pay_id;
-    //余额变更
-    private MemberManage memberManage;
     //支付金额
     private String payMoney;
 
@@ -27,11 +24,10 @@ public class PayVo {
         this.payMoney = payMoney;
     }
 
-    public PayVo(Integer code, String msg, Integer pay_id, MemberManage memberManage, String payMoney) {
+    public PayVo(Integer code, String msg, Integer pay_id, String payMoney) {
         this.msg = msg;
         this.code = code;
         this.pay_id = pay_id;
-        this.memberManage = memberManage;
         this.payMoney = payMoney;
     }
 }
