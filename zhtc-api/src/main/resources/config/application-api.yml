@@ -58,7 +58,7 @@ spring:
 
   #redis配置
   redis:
-    database: 5
+    database: 4
     host: redis
     password: 111111
     port: 6379
