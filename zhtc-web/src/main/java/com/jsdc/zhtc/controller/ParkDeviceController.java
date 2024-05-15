@@ -6,7 +6,6 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.github.pagehelper.PageInfo;
 import com.jsdc.core.base.Base;
 import com.jsdc.core.base.BaseController;
-import com.jsdc.zhtc.bean.InitApplication;
 import com.jsdc.zhtc.common.constants.GlobalData;
 import com.jsdc.zhtc.common.utils.HttpUtils;
 import com.jsdc.zhtc.common.utils.ParkingGateUtils;
@@ -45,9 +44,6 @@ public class ParkDeviceController extends BaseController {
 
     @Autowired
     private ParkingGateUtils parkingGateUtils;
-
-    @Autowired
-    private InitApplication initApplication;
 
     @Autowired
     private ParkService parkService;
