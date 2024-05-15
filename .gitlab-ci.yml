@@ -128,7 +128,7 @@ npm install:
     - cd $WEB_PATH
     - ls -l
     #安装 canvas插件依赖库
-    - apk add --no-cache \
+    - sudo apk add --no-cache \
       build-base \
       cairo-dev \
       pango-dev \
