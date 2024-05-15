@@ -1,6 +1,5 @@
 package com.jsdc.zhtc.common;
 
-import lombok.experimental.UtilityClass;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
@@ -15,16 +14,15 @@ import java.util.Map;
  * @description:
  * @date: 2023/7/7 14:36
  */
-@UtilityClass
 public class ClientUtils {
-    public Map<String, MqttClient> clientMap = new HashMap<>();
+    public static Map<String, MqttClient> clientMap = new HashMap<>();
 
-    public MqttClient getClient(String clientId){
+    public static MqttClient getClient(String clientId){
         MqttClient client = clientMap.get(clientId);
         return client;
     }
 
-    public void setClient(String clientId, MqttClient client){
+    public static void setClient(String clientId, MqttClient client){
         clientMap.put(clientId, client);
     }
 
@@ -36,7 +34,7 @@ public class ClientUtils {
      * @return
      * @throws MqttException
      */
-    public Boolean sendMsg(String clientId, String topic, String msg) throws MqttException {
+    public static Boolean sendMsg(String clientId, String topic, String msg) throws MqttException {
         MqttClient client = getClient(clientId);
         if(null == client){
             return false;
