@@ -1,5 +1,8 @@
 package com.jsdc.zhtc.service;
 
+import cn.afterturn.easypoi.excel.ExcelExportUtil;
+import cn.afterturn.easypoi.excel.entity.TemplateExportParams;
+import cn.hutool.core.lang.UUID;
 import cn.hutool.poi.excel.ExcelReader;
 import cn.hutool.poi.excel.ExcelUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -7,22 +10,28 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jsdc.core.base.BaseService;
 import com.jsdc.zhtc.common.constants.GlobalData;
+import com.jsdc.zhtc.common.utils.IdUtils;
 import com.jsdc.zhtc.common.utils.StringUtils;
 import com.jsdc.zhtc.dao.CarOwnerDao;
 import com.jsdc.zhtc.model.CarOwner;
+import com.jsdc.zhtc.model.Park;
+import com.jsdc.zhtc.model.SysDict;
 import com.jsdc.zhtc.model.SysUser;
 import com.jsdc.zhtc.vo.PageVo;
 import com.jsdc.zhtc.vo.ResultInfo;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -30,12 +39,20 @@ public class CarOwnerService extends BaseService<CarOwnerDao, CarOwner> {
 
     @Autowired
     private SysUserService sysUserService;
+    @Autowired
+    private SysDictService sysDictService;
+    @Value("${excel-export-path}")
+    private String localPath;
 
     /**
-     * 分页查询
+     * 查询
      */
-    public ResultInfo selectAll(PageVo<CarOwner> data) {
+    public PageInfo<CarOwner> selectAll(PageVo<CarOwner> data) {
+        // 判断是否分页查询
+        if (data.getPageNum() != null) {
+            PageHelper.startPage(data.getPageNum(), data.getPageSize());
 
+        }
         CarOwner bean = data.getBean();
 
         QueryWrapper<CarOwner> wrapper = new QueryWrapper<>();
@@ -45,16 +62,15 @@ public class CarOwnerService extends BaseService<CarOwnerDao, CarOwner> {
         wrapper.eq("is_del", GlobalData.ISDEL_NO);
         wrapper.orderByDesc("create_time");
 
-        // 判断是否分页查询
-        if (data.getPageNum() != null) {
-            PageHelper.startPage(data.getPageNum(), data.getPageSize());
-            List<CarOwner> lists = selectList(wrapper);
-            PageInfo<CarOwner> listPage = new PageInfo<>(lists);
-            return ResultInfo.success(listPage);
-        } else {
-            List<CarOwner> lists = this.selectList(wrapper);
-            return ResultInfo.success(lists);
+        List<CarOwner> lists = selectList(wrapper);
+
+        Map<String, String> sysDictMap = sysDictService.getSysDictMap(GlobalData.CAR_OWNER_TYPE);
+        for (CarOwner carOwner : lists) {
+            carOwner.setType_name(sysDictMap.get(carOwner.getType()));
         }
+
+        PageInfo<CarOwner> listPage  = new PageInfo<>(lists);
+        return listPage;
     }
 
     /**
@@ -74,6 +90,7 @@ public class CarOwnerService extends BaseService<CarOwnerDao, CarOwner> {
      */
     public ResultInfo saveData(CarOwner bean) {
         SysUser sysUser = sysUserService.getUser();
+        bean.setId(String.valueOf(UUID.randomUUID()));
         bean.setIs_del(GlobalData.ISDEL_NO);
         bean.setCreate_time(new Date());
         bean.setUpdate_user(sysUser.getId());
@@ -167,5 +184,37 @@ public class CarOwnerService extends BaseService<CarOwnerDao, CarOwner> {
 
         }
         return ResultInfo.error("导入成功");
+    }
+
+    public ResultInfo templateExport(PageVo<CarOwner> data) {
+        TemplateExportParams params = new TemplateExportParams("车管管理导出.xlsx");
+        Map<String, Object> map = new HashMap<String, Object>();
+        PageInfo<CarOwner> CarOwners = this.selectAll(data);
+        CarOwners.getList().forEach(carOwner -> {
+            map.put("name", carOwner.getName());
+            map.put("phone", carOwner.getPhone());
+            map.put("type_name", carOwner.getType_name());
+            map.put("create_time", carOwner.getCreate_time());
+            map.put("create_user_name", carOwner.getCreate_user_name());
+        });
+
+        Workbook workbook = ExcelExportUtil.exportExcel(params, map);
+        File savefile = new File(localPath);
+        FileOutputStream fos = null;
+        String name = IdUtils.simpleUUID() + ".xlsx";
+        if (!savefile.exists()) {
+            savefile.mkdirs();
+        }
+        try {
+            fos = new FileOutputStream(localPath + name);
+            workbook.write(fos);
+            fos.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return ResultInfo.success(name);
     }
 }

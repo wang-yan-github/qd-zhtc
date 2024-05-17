@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jsdc.core.base.BaseService;
+import com.jsdc.zhtc.common.constants.GlobalData;
 import com.jsdc.zhtc.common.utils.StringUtils;
 import com.jsdc.zhtc.dao.SysDictDao;
 import com.jsdc.zhtc.model.SysDict;
@@ -15,6 +16,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * ClassName: SysDictService
@@ -160,5 +163,14 @@ public class SysDictService extends BaseService<SysDictDao, SysDict> {
         cacheDataService.updateDictCache(sysDict);
 
         return ResultInfo.success();
+    }
+
+    public Map<String,String> getSysDictMap(String dict_type){
+        QueryWrapper<SysDict> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("dict_type", dict_type);
+        queryWrapper.eq("is_del", 0);
+        List<SysDict> sysDictList = selectList(queryWrapper);
+        Map<String,String> sysDictMap = sysDictList.stream().collect(Collectors.toMap(SysDict::getDc_value,SysDict::getLabel));
+        return sysDictMap;
     }
 }

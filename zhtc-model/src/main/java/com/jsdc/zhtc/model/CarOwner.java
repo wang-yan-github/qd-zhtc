@@ -1,6 +1,7 @@
 package com.jsdc.zhtc.model;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
@@ -12,6 +13,7 @@ import org.hibernate.annotations.DynamicUpdate;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -30,8 +32,11 @@ public class CarOwner extends Model<CarOwner> implements Serializable {
     private String id;
     //姓名
     private String name;
-    //车主属性（必填、单选框） 内部人员/内部人员/其他
+    //车主属性（必填、单选框）字典表(car_owner_type)
     private String type;
+    @Transient
+    @TableField(exist = false)
+    private String type_name;
     //手机号（必填，手机号格式验证）
     private String phone;
     //工作单位

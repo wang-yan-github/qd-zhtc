@@ -218,5 +218,6 @@ public class GlobalData {
     //全局netty通道
     public Map<String, Channel> CHANNEL_MAP = new HashMap<>();
 
-
+    //车主管理-车主属性
+    public String CAR_OWNER_TYPE = "car_owner_type";
 }

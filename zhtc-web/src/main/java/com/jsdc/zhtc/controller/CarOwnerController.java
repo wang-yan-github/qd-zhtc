@@ -27,7 +27,7 @@ public class CarOwnerController {
     @PostMapping(value = "/getall")
     @ResponseBody
     public ResultInfo getAll(@RequestBody PageVo<CarOwner> data) {
-        ResultInfo json = service.selectAll(data);
+        ResultInfo json = ResultInfo.success(service.selectAll(data));
         return json;
     }
 
@@ -80,6 +80,17 @@ public class CarOwnerController {
     @ResponseBody
     public ResultInfo templateImport(MultipartFile file){
         ResultInfo json = service.templateImport(file);
+        return json;
+    }
+
+    /**
+     * 车牌管理导出
+     *
+     */
+    @RequestMapping("/templateExport")
+    @ResponseBody
+    public ResultInfo templateExport(@RequestBody PageVo<CarOwner> data){
+        ResultInfo json = service.templateExport(data);
         return json;
     }
 }
