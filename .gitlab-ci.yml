@@ -127,6 +127,7 @@ npm install:
     - echo "=============== 开始安装任务  ==============="
     - cd $WEB_PATH
     - ls -l
+    - apk add --no-cache python3 make g++
     - npm install --legacy-peer-deps
     - ls -l
     - echo "=============== 执行结束 ==================="
