@@ -25,10 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 @Transactional
@@ -123,8 +120,8 @@ public class CarOwnerService extends BaseService<CarOwnerDao, CarOwner> {
      * 根据id删除
      */
     public ResultInfo deleById(CarOwner bean) {
-
-        if (deleteById(bean.getId()) > 0) {
+        bean.setIs_del(GlobalData.ISDEL_YES);
+        if (this.updateById(bean) > 0) {
             return ResultInfo.success(null, "删除成功");
         } else {
             return ResultInfo.error(null, "操作失败");
@@ -150,13 +147,13 @@ public class CarOwnerService extends BaseService<CarOwnerDao, CarOwner> {
             return ResultInfo.error("请检查文件后，重新导入！");
         }
         ExcelReader reader = ExcelUtil.getReader(inputStream);
-        List<Map<String, Object>> readAll = reader.readAll();
+        List<Map<String, Object>> readAll = reader.read(1, 1, Integer.MAX_VALUE);
         if (readAll.isEmpty()) {
             return ResultInfo.error("空白模板，请填写内容！");
         }
 
         SysUser sysUser = sysUserService.getUser();
-        for (int i = 0; i < readAll.size(); i++) {
+        for (int i = 2; i < readAll.size(); i++) {
             Map<String, Object> quMap = readAll.get(i);
             //获取表格中的数据
             String type = String.valueOf(quMap.get("车主属性"));
@@ -186,18 +183,24 @@ public class CarOwnerService extends BaseService<CarOwnerDao, CarOwner> {
     }
 
     public ResultInfo templateExport(PageVo<CarOwner> data) {
-        TemplateExportParams params = new TemplateExportParams("车管管理导出.xlsx");
-        Map<String, Object> map = new HashMap<String, Object>();
+        TemplateExportParams params = new TemplateExportParams("车主管理导出.xlsx");
+        List<Map<String, String>> listMap = new ArrayList<Map<String, String>>();
+
         PageInfo<CarOwner> CarOwners = this.selectAll(data);
         CarOwners.getList().forEach(carOwner -> {
+            Map<String, String> map = new HashMap<String, String>();
             map.put("name", carOwner.getName());
             map.put("phone", carOwner.getPhone());
             map.put("type_name", carOwner.getType_name());
-            map.put("create_time", carOwner.getCreate_time());
+            map.put("create_time", String.valueOf(carOwner.getCreate_time()));
             map.put("create_user_name", carOwner.getCreate_user_name());
+            listMap.add(map);
         });
 
-        Workbook workbook = ExcelExportUtil.exportExcel(params, map);
+        Map resultMap = new HashMap();
+        resultMap.put("maplist", listMap);
+
+        Workbook workbook = ExcelExportUtil.exportExcel(params, resultMap);
         File savefile = new File(localPath);
         FileOutputStream fos = null;
         String name = IdUtils.simpleUUID() + ".xlsx";
