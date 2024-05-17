@@ -118,7 +118,7 @@ deploy mqtt jar:
     - echo "=============== 执行结束 ==================="
 
 npm install:
-  image: node:16.20-alpine
+  image: python:3.9-alpine
   stage: npm install
   only:
     - install
@@ -127,7 +127,7 @@ npm install:
     - echo "=============== 开始安装任务  ==============="
     - cd $WEB_PATH
     - ls -l
-    - apk add --no-cache python3 make g++
+    - apk add --no-cache nodejs npm make g++
     - npm install --legacy-peer-deps
     - ls -l
     - echo "=============== 执行结束 ==================="
