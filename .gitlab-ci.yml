@@ -120,7 +120,7 @@ deploy mqtt jar:
     - echo "=============== 执行结束 ==================="
 
 npm install:
-  image: node:16.20-alpine
+  image: node:16
   stage: npm install
   only:
     - install
