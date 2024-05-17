@@ -136,7 +136,7 @@ npm install:
     - echo "=============== 执行结束 ==================="
 
 build vue:
-  image: node:16.20-alpine
+  image: node:16
   stage: build vue
   only:
     - build
