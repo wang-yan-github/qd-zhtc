@@ -8,7 +8,6 @@ variables:
   WEB_PATH: 'vue-manage'
   WEB_NAME: 'qd-zhtc'
 
-
 # 缓存
 cache:
   key: ${CI_BUILD_REF_NAME}
@@ -19,6 +18,9 @@ cache:
     - .m2/repository
     - $API_PATH/target/
     - $API_MQTT_PATH/target/
+
+before_script:
+  - apt-get install -y build-essential libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev
 
 # 阶段
 stages:
@@ -118,7 +120,7 @@ deploy mqtt jar:
     - echo "=============== 执行结束 ==================="
 
 npm install:
-  image: python:3.9-alpine
+  image: node:16.20-alpine
   stage: npm install
   only:
     - install
@@ -127,7 +129,6 @@ npm install:
     - echo "=============== 开始安装任务  ==============="
     - cd $WEB_PATH
     - ls -l
-    - apk add --no-cache nodejs npm make g++
     - npm install --legacy-peer-deps
     - ls -l
     - echo "=============== 执行结束 ==================="
