@@ -66,11 +66,11 @@ public class OperateAppealController extends BaseController {
     @RequestMapping(value = "selectByPage.json", method = RequestMethod.POST)
     @ResponseBody
     public ResultInfo selectByPage(@RequestParam(defaultValue = "1") Integer pageIndex, @RequestParam(defaultValue = "10") Integer pageSize, RoadOrParkingCommentVo bean) {
-        if (GlobalData.PARKING_TYPE_PLAT.equals(sysUserService.redisRoadOrPark())) {
+//        if (GlobalData.PARKING_TYPE_PLAT.equals(sysUserService.redisRoadOrPark())) {
             SysUser user = sysUserService.getUser();
             bean.setPark_id(sysUserService.getUser().getPark_id());
             bean.setUserType(sysUserService.getUser().getUser_type());//停车场
-        }
+//        }
         return appealService.selectByPage(bean, pageIndex, pageSize);
     }
 

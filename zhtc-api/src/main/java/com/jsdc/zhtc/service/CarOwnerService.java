@@ -14,8 +14,6 @@ import com.jsdc.zhtc.common.utils.IdUtils;
 import com.jsdc.zhtc.common.utils.StringUtils;
 import com.jsdc.zhtc.dao.CarOwnerDao;
 import com.jsdc.zhtc.model.CarOwner;
-import com.jsdc.zhtc.model.Park;
-import com.jsdc.zhtc.model.SysDict;
 import com.jsdc.zhtc.model.SysUser;
 import com.jsdc.zhtc.vo.PageVo;
 import com.jsdc.zhtc.vo.ResultInfo;
@@ -31,7 +29,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional

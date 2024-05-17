@@ -13,10 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
@@ -31,7 +28,7 @@ import java.util.Map;
  * @author bn<br                               />
  */
 @Controller
-@RequestMapping("park")
+@RequestMapping("/park")
 public class ParkController extends BaseController {
 
 
@@ -78,9 +75,9 @@ public class ParkController extends BaseController {
      * @return
      * @author bn
      */
-    @RequestMapping(value = "toAdd.do", method = RequestMethod.POST)
+    @RequestMapping(value = "/toAdd.do", method = RequestMethod.POST)
     @ResponseBody
-    public ResultInfo toAdd(Park park) {
+    public ResultInfo toAdd(@RequestBody Park park) {
         park.setIs_del("0");
         park.setStatus("0");
         //限流开关 0开启 1关闭
@@ -148,5 +145,33 @@ public class ParkController extends BaseController {
     @ResponseBody
     public void exportParking(Park vo, HttpServletResponse response) {
         parkService.exportParking(vo, response);
+    }
+
+
+
+
+    /**
+     * @description:编辑停车场信息
+     * @author wzn
+     * @date 2024/5/15 14:14
+     */
+    @RequestMapping(value = "/toEdit.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ResultInfo toEdit(@RequestBody Park park) {
+        park.setUpdate_time(new Date());
+        park.setUpdate_user(sysUserService.getUser().getId());
+
+        //上传交控
+        parkService.uploadParkingInfo(park) ;
+
+
+        parkService.updateById(park);
+        Park parkData = parkService.selectById(park);
+        cacheDataService.updateLocationCache(park);
+        cacheDataService.updChargeByRoad_ParkId(parkData.getId());
+
+        String msg = "修改成功";
+
+        return ResultInfo.successMsg(msg);
     }
 }

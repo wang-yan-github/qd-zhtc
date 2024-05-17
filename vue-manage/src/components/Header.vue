@@ -58,34 +58,34 @@
       </ul>
       <div class="header-right">
         <div class="header-user-con">
-          <div
-            class="swichbtn"
-            @click="systemChage('r_close')"
-            v-show="btnisshow"
-          >
-            <el-tooltip
-              class="item"
-              effect="dark"
-              content="切换至停车场后台管理"
-              placement="bottom"
-            >
-              <p><i class="el-icon-sort"></i>至停车场</p>
-            </el-tooltip>
-          </div>
-          <div
-            class="swichbtn"
-            @click="systemChageroad('p_close')"
-            v-show="btnishide"
-          >
-            <el-tooltip
-              class="item"
-              effect="dark"
-              content="切换至路内后台管理"
-              placement="bottom"
-            >
-              <p><i class="el-icon-sort"></i>至路内</p>
-            </el-tooltip>
-          </div>
+          <!--<div-->
+            <!--class="swichbtn"-->
+            <!--@click="systemChage('r_close')"-->
+            <!--v-show="btnisshow"-->
+          <!--&gt;-->
+            <!--<el-tooltip-->
+              <!--class="item"-->
+              <!--effect="dark"-->
+              <!--content="切换至停车场后台管理"-->
+              <!--placement="bottom"-->
+            <!--&gt;-->
+              <!--<p><i class="el-icon-sort"></i>至停车场</p>-->
+            <!--</el-tooltip>-->
+          <!--</div>-->
+          <!--<div-->
+            <!--class="swichbtn"-->
+            <!--@click="systemChageroad('p_close')"-->
+            <!--v-show="btnishide"-->
+          <!--&gt;-->
+            <!--<el-tooltip-->
+              <!--class="item"-->
+              <!--effect="dark"-->
+              <!--content="切换至路内后台管理"-->
+              <!--placement="bottom"-->
+            <!--&gt;-->
+              <!--<p><i class="el-icon-sort"></i>至路内</p>-->
+            <!--</el-tooltip>-->
+          <!--</div>-->
 
           <!-- 消息中心 -->
           <el-dropdown trigger="click">
@@ -467,19 +467,20 @@ export default {
           btnisshow.value = false;
           btnishide.value = false;
         } else {
-          if (isRP != null) {
-            if (isRP == "1") {
-              systemChage(menu_close);
-            } else {
-              systemChageroad(menu_close);
-            }
-          } else {
-            if (mainmenu.value.length > 0) {
-              systemChageroad(menu_close);
-            } else {
-              systemChage(menu_close);
-            }
-          }
+          systemChage(menu_close);
+          // if (isRP != null) {
+          //   if (isRP == "1") {
+          //     systemChage(menu_close);
+          //   } else {
+          //     systemChageroad(menu_close);
+          //   }
+          // } else {
+          //   if (mainmenu.value.length > 0) {
+          //     systemChageroad(menu_close);
+          //   } else {
+          //     systemChage(menu_close);
+          //   }
+          // }
         }
       });
     };
@@ -524,7 +525,7 @@ export default {
         authoritys.value = res.data.authoritys;
         menuCommandPark(0, firstParkParentNode.value);
       });
-      
+
       switchModel(reactive({ type: "1" })).then((res) => {
         if (res.code === 0) {
           // if(val!=""){

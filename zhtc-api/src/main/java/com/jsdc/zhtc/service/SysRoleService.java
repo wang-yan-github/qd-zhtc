@@ -92,11 +92,11 @@ public class SysRoleService extends BaseService<SysRoleDao, SysRole> {
         List<Integer> menuIds = roleMenus.stream().map(x -> x.getMenu_id()).collect(Collectors.toList());
 
         List<SysMenu> menus = menuService.getMenus(menuIds);
-        List<SysMenu> roadMenuList = menus.stream().filter(x -> x.getMenu_type().equals("0")).collect(Collectors.toList());
+//        List<SysMenu> roadMenuList = menus.stream().filter(x -> x.getMenu_type().equals("0")).collect(Collectors.toList());
         List<SysMenu> parkMenuList = menus.stream().filter(x -> x.getMenu_type().equals("1")).collect(Collectors.toList());
         sysRole.setMenus(menus);
         sysRole.setMenuIdList(menuIds);
-        sysRole.setRoadMenuList(roadMenuList.stream().map(x -> x.getId()).collect(Collectors.toList()));
+//        sysRole.setRoadMenuList(roadMenuList.stream().map(x -> x.getId()).collect(Collectors.toList()));
         sysRole.setParkMenuList(parkMenuList.stream().map(x -> x.getId()).collect(Collectors.toList()));
         return ResultInfo.success(sysRole);
     }

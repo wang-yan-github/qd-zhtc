@@ -86,6 +86,8 @@ public class SysMenuService extends BaseService<SysMenuDao, SysMenu> {
             }
         }
         wrapper.eq(SysMenu::getIs_del, GlobalData.ISDEL_NO);
+
+        wrapper.eq(SysMenu::getMenu_type, "1");//菜单类型 0：路段 1：停车场
     }
 
     /**
@@ -168,26 +170,28 @@ public class SysMenuService extends BaseService<SysMenuDao, SysMenu> {
         LambdaQueryWrapper<SysMenu> wrapper = new LambdaQueryWrapper<>();
         wrapper.in(SysMenu::getId, menuIds);
         wrapper.eq(SysMenu::getIs_del, GlobalData.ISDEL_NO);
+        wrapper.eq(SysMenu::getMenu_type, "1");//菜单类型 0：路段 1：停车场
         return selectList(wrapper);
     }
 
     public ResultInfo getMenuTree() {
         LambdaQueryWrapper<SysMenu> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(SysMenu::getIs_del, GlobalData.ISDEL_NO);
+        wrapper.eq(SysMenu::getMenu_type, "1");//菜单类型 0：路段 1：停车场
         List<SysMenu> menus = selectList(wrapper);
-        List<SysMenu> roadMenus = menus.stream().filter(x -> x.getMenu_type().equals("0")).collect(Collectors.toList());
+//        List<SysMenu> roadMenus = menus.stream().filter(x -> x.getMenu_type().equals("0")).collect(Collectors.toList());
         List<SysMenu> parkMenus = menus.stream().filter(x -> x.getMenu_type().equals("1")).collect(Collectors.toList());
         TreeNodeConfig treeNodeConfig = new TreeNodeConfig();
         treeNodeConfig.setIdKey("id");
         treeNodeConfig.setNameKey("label");
         treeNodeConfig.setDeep(3);
-        List<Tree<String>> roadTreeNodes = TreeUtil.build(roadMenus, "0", treeNodeConfig,
-                (treeNode, tree) -> {
-                    tree.setId(String.valueOf(treeNode.getId()));
-                    tree.setParentId(String.valueOf(treeNode.getParent_id()));
-                    tree.setWeight("");
-                    tree.setName(treeNode.getMenu_name());
-                });
+//        List<Tree<String>> roadTreeNodes = TreeUtil.build(roadMenus, "0", treeNodeConfig,
+//                (treeNode, tree) -> {
+//                    tree.setId(String.valueOf(treeNode.getId()));
+//                    tree.setParentId(String.valueOf(treeNode.getParent_id()));
+//                    tree.setWeight("");
+//                    tree.setName(treeNode.getMenu_name());
+//                });
 
         List<Tree<String>> parkTreeNodes = TreeUtil.build(parkMenus, "0", treeNodeConfig,
                 (treeNode, tree) -> {
@@ -198,7 +202,7 @@ public class SysMenuService extends BaseService<SysMenuDao, SysMenu> {
                 });
 
         JSONObject result = new JSONObject();
-        result.put("roadTree", roadTreeNodes);
+//        result.put("roadTree", roadTreeNodes);
         result.put("parkTree", parkTreeNodes);
         return ResultInfo.success(result);
     }

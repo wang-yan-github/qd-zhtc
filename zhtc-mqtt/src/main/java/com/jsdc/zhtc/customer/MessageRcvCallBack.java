@@ -26,6 +26,7 @@ import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static com.jsdc.core.base.Base.empty;
@@ -67,7 +68,7 @@ public class MessageRcvCallBack implements MqttCallback {
             JSONObject jsonObject = JSONObject.parseObject(new String(mqttMessage.getPayload(), StandardCharsets.UTF_8));
 //            logger.info("mqtt订阅设备心跳data:" + jsonObject.toJSONString());
             if (StringUtils.equals("result", jsonObject.getString("cmd"))) {
-
+                dealData(jsonObject, topic);
             } else if (StringUtils.equals("offline", jsonObject.getString("cmd"))) {
                 //设备离线
                 String deviceCode = jsonObject.getString("device_name");
@@ -98,7 +99,17 @@ public class MessageRcvCallBack implements MqttCallback {
         System.out.println("deliveryComplete---------" + iMqttDeliveryToken.isComplete());
     }
 
-
+    public void dealData(JSONObject jsonObject, String topic) {
+        String deviceCode = Arrays.asList(topic.split("/")).get(2);
+        ParkDevice parkDevice = deviceService.selectOne(Wrappers.<ParkDevice>lambdaQuery().eq(ParkDevice::getDevice_code, deviceCode).eq(ParkDevice::getIs_del, GlobalData.IS_DEL_NO));
+        if (StringUtils.equals(parkDevice.getPassageway(), "1")) {
+            System.out.println("车辆驶入---------");
+            parkIn(deviceCode, jsonObject.toJSONString());
+        } else if (StringUtils.equals(parkDevice.getPassageway(), "0")) {
+            System.out.println("车辆驶出---------");
+            parkOut(deviceCode, jsonObject.toJSONString());
+        }
+    }
 
     public void parkIn(String deviceCode, String data) {
         try {
@@ -172,6 +183,55 @@ public class MessageRcvCallBack implements MqttCallback {
             e.printStackTrace();
         }
     }
+    public void parkOut(String deviceCode, String data) {
+        try {
+            logger.info("车辆驶出");
+//            data = new String(data.getBytes(), "UTF-8");
+            DcParkInfo dcParkInfo = JSON.parseObject(data, DcParkInfo.class);
+            ParkingOrderVo vo = new ParkingOrderVo();
 
+            List<ParkingOrderPics> list = new ArrayList<>();
+            String base64 = dcParkInfo.getFull_pic();
+            ParkingOrderPics parkingOrderPics = new ParkingOrderPics();
+            parkingOrderPics.setPicture_type(GlobalData.PARKING_DIRECTION_OUT);
+            parkingOrderPics.setBase64(base64);
+            list.add(parkingOrderPics);
+            vo.setDetails(list);
+            vo.setCar_no(StringUtils.isEmpty(dcParkInfo.getPlate_num()) ? "" : dcParkInfo.getPlate_num().toUpperCase());
+            switch (dcParkInfo.getPlate_color()) {
+                case "蓝色":
+                    vo.setCar_type("1");
+                    break;
+                case "黄色":
+                    vo.setCar_type("3");
+                    break;
+                case "白色":
+                    vo.setCar_type("4");
+                    break;
+                case "绿色":
+                    vo.setCar_type("2");
+                    break;
+                default:
+                    vo.setCar_type("1");
+                    break;
+            }
+            ParkDevice parkDevice = deviceService.selectOne(Wrappers.<ParkDevice>lambdaQuery().eq(ParkDevice::getDevice_code, deviceCode).eq(ParkDevice::getIs_del, GlobalData.IS_DEL_NO));
+            if (null == parkDevice) {
+                logger.error("未查询到设备信息，设备编码: " + deviceCode);
+            }
+            logger.info("车辆驶出，车牌号：" + vo.getCar_no());
+            Park park = parkService.selectById(parkDevice.getPark_id());
+            vo.setParkCode(park.getPark_code());
+            vo.setDriveout_gate(deviceCode);
+            vo.setOutChannelId(deviceCode);
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+            vo.setDriveout_time(dateFormat.parse(dcParkInfo.getLocal_time()));
+            vo.setSource(GlobalData.PARKING_SOURCE_CAMERA);
+            parkingOrderService.exit(vo);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+    }
 
 }

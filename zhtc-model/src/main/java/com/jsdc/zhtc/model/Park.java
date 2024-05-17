@@ -55,11 +55,46 @@ public class Park extends Model<Park> implements Serializable {
     // 泊位总数
     private Integer park_num;
 
+    //开放泊位数
+    private Integer openBerthNum;
+
+    //临停车位数
+    private Integer tempTotalNum;
+
+    //月租车位数
+    private Integer intrinsicTotalNum;
+
+    //访客车位数
+    private Integer visitorTotalNum;
+
+    //充电桩车位数
+    private Integer chargeTotalNum;
+
     //停车场类型 1.急诊区域
     private String park_grade;
 
     // 城市
     private String city;
+
+    //城区编号01 ：市南；02 ：市北；03：黄岛；04 ：崂山；05 ：李沧；06 ：城阳；07 ：
+    //即墨；08 ：胶州；09 ：平度；10 ：莱西
+    private String area_code;
+
+
+    //定价类型 1 ：政府定价； 2 ：市场定价 ；3 ：不收费
+    private String price_type;
+
+    //开放时间
+    private String openTime;
+
+    //停车位置  1 ：路外；2 ：路内
+    private String parkingLocate;
+
+    //停车场类型  1 ：配建停车场；2 ：公共停车场；3 ：道路停车位
+    private String parkingType;
+
+
+
 
     // 区域 area 表主键
     private Integer area_id;
@@ -70,10 +105,10 @@ public class Park extends Model<Park> implements Serializable {
     //地址
     private String address;
 
-    // 经度
+    // 百度经度
     private String longitude = "0";
 
-    //纬度
+    //百度纬度
     private String latitude = "0";
 
     // 状态 0启用 1.禁用

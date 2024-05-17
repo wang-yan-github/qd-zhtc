@@ -44,7 +44,7 @@ public class InvoicesManagementService extends BaseService<InvoicesManagementDao
      */
     public PageInfo listInvoicesManagement(Integer pageIndex, Integer pageSize, String phone, String invoice_mode) {
         PageHelper.startPage(pageIndex, pageSize);
-        List<InvoicesManagement> list = invoicesManagementMapper.listInvoicesManagement(phone, invoice_mode, sysUserService.redisRoadOrPark());
+        List<InvoicesManagement> list = invoicesManagementMapper.listInvoicesManagement(phone, invoice_mode, "1");
         //发票类型
         HashMap<String, SysDict> invoiceTypeMap = DcCacheDataUtil.getMapDicts("invoice_type");
         //开票状态

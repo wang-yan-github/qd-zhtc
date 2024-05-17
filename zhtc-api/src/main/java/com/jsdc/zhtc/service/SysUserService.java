@@ -93,9 +93,9 @@ public class SysUserService extends BaseService<SysUserDao, SysUser> {
     }
 
     //判断缓存查询是否包含路段、停车场角色
-    public String redisRoadOrPark() {
-        return (String) RedisUtils.getBeanValue(getUser().getLogin_name() + "_sys");
-    }
+//    public String redisRoadOrPark() {
+//        return (String) RedisUtils.getBeanValue(getUser().getLogin_name() + "_sys");
+//    }
 
     /**
      * create by wp at 2021/12/30 14:07
@@ -371,7 +371,7 @@ public class SysUserService extends BaseService<SysUserDao, SysUser> {
         List<Integer> menuIds = roleMenus.stream().map(x -> x.getMenu_id()).collect(Collectors.toList());
         List<SysMenu> menuAll = menuService.getMenus(menuIds);
         List<SysMenu> menus = menuAll.stream().filter(x -> x.getIs_button() == 0).collect(Collectors.toList());
-        List<String> authoritys = menuAll.stream().filter(x -> x.getIs_button() == 1 && redisRoadOrPark().equals(x.getMenu_type())).map(x -> x.getCode()).collect(Collectors.toList());
+        List<String> authoritys = menuAll.stream().filter(x -> x.getIs_button() == 1 && "1".equals(x.getMenu_type())).map(x -> x.getCode()).collect(Collectors.toList());
         //路段菜单
         List<SysMenu> topMenus = menus.stream().filter(x -> x.getParent_id() == 0 && x.getMenu_type().equals("0")).collect(Collectors.toList());
         Collections.sort(topMenus, comparing(SysMenu::getSort));
@@ -447,7 +447,7 @@ public class SysUserService extends BaseService<SysUserDao, SysUser> {
         parkresult.put("firstParkParentNode", firstParkParentNode);
         parkresult.put("firstParkChildNode", firstParkChildNode);
         String key = sysUser.getLogin_name() + "_sys";
-        String isRP = redisRoadOrPark();
+        String isRP = "1";
         JSONObject res = new JSONObject();
         if (GlobalData.PARKING_TYPE_ROAD.equals(sysUser.getUser_type()) && notEmpty(isRP)) {
             RedisUtils.setBeanValue(key, isRP);

@@ -35,7 +35,7 @@ public class AttendanceManagementController extends BaseController {
     @ResponseBody
     public ResultInfo toList(@RequestParam(defaultValue = "1") Integer pageIndex, @RequestParam(defaultValue = "10") Integer pageSize, AttendanceManagement beanParam) {
         // 类型 0 路段 1停车场
-        beanParam.setType(sysUserService.redisRoadOrPark());
+        beanParam.setType("1");
         PageInfo<AttendanceManagement> page = attendanceManagementService.toList(pageIndex, pageSize, beanParam);
 
         return ResultInfo.success(page);

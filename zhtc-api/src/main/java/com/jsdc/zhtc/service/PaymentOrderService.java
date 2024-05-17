@@ -82,7 +82,7 @@ public class PaymentOrderService extends BaseService<PaymentOrderDao, PaymentOrd
         if (sysUser.getUser_type().equals("1")) {
             vo.setPark_id(sysUser.getPark_id());
         }
-        vo.setParkingType(sysUserService.redisRoadOrPark());
+        vo.setParkingType("1");
 
         PageHelper.startPage(pageIndex, pageSize);
         List<Map<String, String>> list = paymentOrderMapper.listPaymentOrder(vo);
@@ -100,7 +100,7 @@ public class PaymentOrderService extends BaseService<PaymentOrderDao, PaymentOrd
         PageInfo pageInfo = new PageInfo(list);
         Map map = new HashMap();
         map.put("page", pageInfo);
-        map.put("parkingType", sysUserService.redisRoadOrPark());
+        map.put("parkingType", "1");
         return ResultInfo.success(map);
     }
 
@@ -111,7 +111,7 @@ public class PaymentOrderService extends BaseService<PaymentOrderDao, PaymentOrd
      * @return
      */
     public ResultInfo listRoadParkingOrder(PaymentOrderVo vo) {
-        vo.setParkingType(sysUserService.redisRoadOrPark());
+        vo.setParkingType("1");
         List<Map<String, String>> list = paymentOrderMapper.listRoadParkingOrder(vo);
         for (Map<String, String> x : list) {
             if (null != x.get("resitime")) {

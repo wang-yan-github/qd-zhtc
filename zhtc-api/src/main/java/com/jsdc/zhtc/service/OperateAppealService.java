@@ -69,13 +69,13 @@ public class OperateAppealService extends BaseService<OperateAppealDao, OperateA
                 bean.setUserType(sysUserService.getUser().getUser_type());
                 return ResultInfo.success(parkingOrderService.selectWXPage(pageIndex, pageSize, bean));
             } else {
-                if (GlobalData.PARKING_TYPE_ROAD.equals(sysUserService.redisRoadOrPark())) {
-                    bean.setType(GlobalData.PARKING_TYPE_ROAD); //运营
-                    return ResultInfo.success(parkingOrderService.selectWXPage(pageIndex, pageSize, bean));
-                } else {
+//                if (GlobalData.PARKING_TYPE_ROAD.equals(sysUserService.redisRoadOrPark())) {
+//                    bean.setType(GlobalData.PARKING_TYPE_ROAD); //运营
+//                    return ResultInfo.success(parkingOrderService.selectWXPage(pageIndex, pageSize, bean));
+//                } else {
                     bean.setType(GlobalData.PARKING_TYPE_PLAT); //停车场
                     return ResultInfo.success(parkingOrderService.selectWXPage(pageIndex, pageSize, bean));
-                }
+//                }
             }
         } else {
             return ResultInfo.error("暂无数据");
@@ -103,7 +103,7 @@ public class OperateAppealService extends BaseService<OperateAppealDao, OperateA
 //
 //        Long count = selectCount(queryWrapper);
         PageHelper.startPage(pageIndex, pageSize);
-        List<OperateAppealVo> list = operateAppealMapper.selectByPage(bean, sysUserService.redisRoadOrPark());
+        List<OperateAppealVo> list = operateAppealMapper.selectByPage(bean, "1");
         list.forEach(a -> {
             HashMap<String, SysDict> roadStatus = DcCacheDataUtil.getMapDicts("roadStatus");
             HashMap<String, SysDict> appeal_status = DcCacheDataUtil.getMapDicts("appeal_status");
@@ -122,7 +122,7 @@ public class OperateAppealService extends BaseService<OperateAppealDao, OperateA
         });
 //        object.put("wcl_count", count);
         object.put("page", new PageInfo<>(list));
-        List<ReportVo> voList = operateAppealMapper.getAppealStatusCount(bean, sysUserService.redisRoadOrPark());
+        List<ReportVo> voList = operateAppealMapper.getAppealStatusCount(bean, "1");
 
         int zs_count = 0;
         int ycl_count = 0;
@@ -162,7 +162,7 @@ public class OperateAppealService extends BaseService<OperateAppealDao, OperateA
     //申诉订单导出
     public void exportOperateAppeal(RoadOrParkingCommentVo bean, HttpServletResponse response) {
         ExcelWriter writer = ExcelUtil.getWriter();
-        List<OperateAppealVo> list = operateAppealMapper.selectByPage(bean, sysUserService.redisRoadOrPark());
+        List<OperateAppealVo> list = operateAppealMapper.selectByPage(bean, "1");
         list.forEach(a -> {
             HashMap<String, SysDict> roadStatus = DcCacheDataUtil.getMapDicts("roadStatus");
             HashMap<String, SysDict> appeal_status = DcCacheDataUtil.getMapDicts("appeal_status");

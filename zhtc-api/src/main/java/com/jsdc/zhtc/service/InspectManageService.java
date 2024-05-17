@@ -141,9 +141,9 @@ public class InspectManageService extends BaseService<InspectManageDao, InspectM
     //分页查询
     public List<InspectManageVo> selectPageList(Integer pageIndex, Integer pageSize, InspectManageVo bean) {
         PageHelper.startPage(pageIndex, pageSize);
-        List<InspectManageVo> list = manageMapper.selectPageList(bean, sysUserService.redisRoadOrPark());
+        List<InspectManageVo> list = manageMapper.selectPageList(bean, "1");
         for (InspectManageVo a : list) {
-            Integer berth_num = manageMapper.selectByGroupBerthnum(sysUserService.redisRoadOrPark(), a.getId());
+            Integer berth_num = manageMapper.selectByGroupBerthnum("1", a.getId());
             if (null != berth_num) {
                 a.setBerth_num(berth_num);
             } else {
@@ -178,7 +178,7 @@ public class InspectManageService extends BaseService<InspectManageDao, InspectM
                     bean.setIs_del(0);
                     bean.setCreate_time(new Date());
                     bean.setCreate_user(sysUserService.getUser().getId());
-                    bean.setPersonType(sysUserService.redisRoadOrPark());
+                    bean.setPersonType("1");
                     bean.setLogpwd(MD5Utils.getMD5(bean.getLogpwd()));
                     if (insert(bean) > 0) {
                         return ResultInfo.success("操作成功！");

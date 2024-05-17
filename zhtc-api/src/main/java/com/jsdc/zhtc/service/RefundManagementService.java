@@ -61,7 +61,7 @@ public class RefundManagementService extends BaseService<RefundManagementDao, Re
             data.setParking_type("2");
             data.setParkId(sysUser.getPark_id());
         } else {
-            String road_park = sysUserService.redisRoadOrPark();
+            String road_park = "1";
             data.setParking_type(road_park);
         }
         // 判断是否分页查询
@@ -206,7 +206,7 @@ public class RefundManagementService extends BaseService<RefundManagementDao, Re
             bean.setParking_type("2");
             bean.setParkId(sysUser.getPark_id());
         } else {
-            String road_park = sysUserService.redisRoadOrPark();
+            String road_park = "1";
             bean.setParking_type(road_park);
         }
         List<RefundManagementVo> list = mapper.selectAll(bean);

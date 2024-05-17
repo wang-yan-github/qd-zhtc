@@ -24,7 +24,7 @@ public class CarOwnerController {
     /**
      * 分页查询
      */
-    @PostMapping(value = "/getall")
+    @PostMapping(value = "/getAll")
     @ResponseBody
     public ResultInfo getAll(@RequestBody PageVo<CarOwner> data) {
         ResultInfo json = ResultInfo.success(service.selectAll(data));
@@ -35,7 +35,7 @@ public class CarOwnerController {
     /**
      * 根据id查询
      */
-    @RequestMapping(value = "/getbyid", method = RequestMethod.POST)
+    @RequestMapping(value = "/getById", method = RequestMethod.POST)
     @ResponseBody
     public ResultInfo getById(@RequestBody CarOwner bean) {
         ResultInfo json = service.selectById(bean);
@@ -74,22 +74,20 @@ public class CarOwnerController {
 
     /**
      * 车牌管理模板导入
-     *
      */
     @RequestMapping("/templateImport")
     @ResponseBody
-    public ResultInfo templateImport(MultipartFile file){
+    public ResultInfo templateImport(MultipartFile file) {
         ResultInfo json = service.templateImport(file);
         return json;
     }
 
     /**
      * 车牌管理导出
-     *
      */
     @RequestMapping("/templateExport")
     @ResponseBody
-    public ResultInfo templateExport(@RequestBody PageVo<CarOwner> data){
+    public ResultInfo templateExport(@RequestBody PageVo<CarOwner> data) {
         ResultInfo json = service.templateExport(data);
         return json;
     }

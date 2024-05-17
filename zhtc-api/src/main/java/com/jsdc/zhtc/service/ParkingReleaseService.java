@@ -50,18 +50,18 @@ public class ParkingReleaseService extends BaseService<ParkingReleaseDao, Parkin
      */
     public List<ParkingReleaseVo> selectPageList(Integer pageIndex, Integer pageSize, ParkingReleaseVo bean) {
         PageHelper.startPage(pageIndex, pageSize);
-        List<ParkingReleaseVo> list = releaseMapper.selectPageList(bean, sysUserService.redisRoadOrPark());
-        if (GlobalData.PARKING_TYPE_ROAD.equals(sysUserService.redisRoadOrPark())) {
+        List<ParkingReleaseVo> list = releaseMapper.selectPageList(bean, "1");
+//        if (GlobalData.PARKING_TYPE_ROAD.equals(sysUserService.redisRoadOrPark())) {
+//            // 引用当前收费上线路段
+//            list.forEach(x -> {
+//                x.setPlaces(placeService.selectByPReleaseId(x.getId(), sysUserService.redisRoadOrPark()));
+//            });
+//        } else {
             // 引用当前收费上线路段
             list.forEach(x -> {
-                x.setPlaces(placeService.selectByPReleaseId(x.getId(), sysUserService.redisRoadOrPark()));
+                x.setPlaces(placeService.selectByPReleaseId(x.getId(), "1"));
             });
-        } else {
-            // 引用当前收费上线路段
-            list.forEach(x -> {
-                x.setPlaces(placeService.selectByPReleaseId(x.getId(), sysUserService.redisRoadOrPark()));
-            });
-        }
+//        }
         return list;
     }
 
@@ -114,7 +114,7 @@ public class ParkingReleaseService extends BaseService<ParkingReleaseDao, Parkin
                 //上线收费配置
                 bean.setUpdate_time(new Date());
                 bean.setUpdate_user(sysUserService.getUser().getId());
-                bean.setParking_type(sysUserService.redisRoadOrPark());
+                bean.setParking_type("1");
                 if (updateById(bean) > 0) {
                     //保存上线收费停车区域配置
                     placeService.save(bean);
@@ -128,7 +128,7 @@ public class ParkingReleaseService extends BaseService<ParkingReleaseDao, Parkin
                 bean.setStatus(1);
                 bean.setCreate_time(new Date());
                 bean.setCreate_user(sysUserService.getUser().getId());
-                bean.setParking_type(sysUserService.redisRoadOrPark());
+                bean.setParking_type("1");
 
                 if (insert(bean) > 0) {
                     //保存上线收费停车区域配置

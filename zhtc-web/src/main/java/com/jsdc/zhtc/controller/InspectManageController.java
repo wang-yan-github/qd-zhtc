@@ -56,7 +56,7 @@ public class InspectManageController extends BaseController {
     @ResponseBody
     public AjaxResult selectList() {
         LambdaQueryWrapper<InspectManage> queryWrapper = new LambdaQueryWrapper();
-        queryWrapper.eq(InspectManage::getPersonType, sysUserService.redisRoadOrPark());
+        queryWrapper.eq(InspectManage::getPersonType, "1");
         queryWrapper.eq(InspectManage::getIs_del, GlobalData.ISDEL_NO);
         List<InspectManage> list = manageService.selectList(queryWrapper);
         return AjaxResult.success(list);

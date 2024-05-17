@@ -45,7 +45,7 @@ public class PatrolRechargeManagementService extends BaseService<PatrolRechargeM
      */
     public ResultInfo listPatrolRechargeManagement(Integer pageIndex, Integer pageSize, PatrolRechargeManagementVo vo) {
         PageHelper.startPage(pageIndex, pageSize);
-        vo.setParking_type(sysUserService.redisRoadOrPark());
+        vo.setParking_type("1");
         List<Map<String, String>> list = rechargeManagementMapper.listPatrolRechargeManagement(vo);
         list.forEach(x -> {
             if (null != x.get("recharge_amount")) {
@@ -63,7 +63,7 @@ public class PatrolRechargeManagementService extends BaseService<PatrolRechargeM
      * @return 充值人数 充值笔数 充值笔数
      */
     public ResultInfo countPatrolRechargeManagement(PatrolRechargeManagementVo vo) {
-        vo.setParking_type(sysUserService.redisRoadOrPark());
+        vo.setParking_type("1");
         Map<String, String> map = rechargeManagementMapper.countPatrolRechargeManagement(vo);
         if (null != map.get("recharge_amount")) {
             map.put("recharge_amount", new BigDecimal(String.valueOf(map.get("recharge_amount"))).setScale(2, BigDecimal.ROUND_HALF_UP).toString());
@@ -79,7 +79,7 @@ public class PatrolRechargeManagementService extends BaseService<PatrolRechargeM
      */
     public ResultInfo countPatrolRechargeManagementTime(Integer pageIndex, Integer pageSize, PatrolRechargeManagementVo vo) {
         PageHelper.startPage(pageIndex, pageSize);
-        vo.setParking_type(sysUserService.redisRoadOrPark());
+        vo.setParking_type("1");
         List<Map<String, String>> list = rechargeManagementMapper.countPatrolRechargeManagementTime(vo);
         list.forEach(x -> {
             if (null != x.get("recharge_amount")) {
@@ -98,7 +98,7 @@ public class PatrolRechargeManagementService extends BaseService<PatrolRechargeM
      */
     public ResultInfo countPatrolRechargeManagementInject(Integer pageIndex, Integer pageSize, PatrolRechargeManagementVo vo) {
         PageHelper.startPage(pageIndex, pageSize);
-        vo.setParking_type(sysUserService.redisRoadOrPark());
+        vo.setParking_type("1");
         List<Map<String, String>> list = rechargeManagementMapper.countPatrolRechargeManagementInject(vo);
         list.forEach(x -> {
             if (null != x.get("recharge_amount")) {

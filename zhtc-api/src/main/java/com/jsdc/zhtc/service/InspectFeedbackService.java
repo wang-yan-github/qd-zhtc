@@ -57,7 +57,7 @@ public class InspectFeedbackService extends BaseService<InspectFeedbackDao, Insp
      */
     public List<InspectFeedbackVo> selectPageList(Integer pageIndex, Integer pageSize, InspectFeedbackVo bean) {
         PageHelper.startPage(pageIndex, pageSize);
-        List<InspectFeedbackVo> list = mapper.selectPageList(bean, sysUserService.redisRoadOrPark());
+        List<InspectFeedbackVo> list = mapper.selectPageList(bean, "1");
         list.forEach(a -> {
             HashMap<String, SysDict> feedback_type = DcCacheDataUtil.getMapDicts("feedback_type");
             if (null != a.getFeedback_type()) {

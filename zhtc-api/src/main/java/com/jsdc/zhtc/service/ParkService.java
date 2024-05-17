@@ -1,5 +1,6 @@
 package com.jsdc.zhtc.service;
 
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.poi.excel.ExcelUtil;
 import cn.hutool.poi.excel.ExcelWriter;
@@ -25,6 +26,7 @@ import javax.transaction.Transactional;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URLEncoder;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -159,29 +161,29 @@ public class ParkService extends BaseService<ParkDao, Park> {
 
 
     // 上传入场记录
-    public static void main (String[] args) {
+    public String  uploadParkingInfo (Park park) {
         JSONObject paramJson = new JSONObject();
-        paramJson.put("parkingCode", "370200240426LLDAch");	// 停车场编号，该编号在场库系统中保证唯一
-        paramJson.put("parkingName", "吴山广场22");	// 停车场名称
-        paramJson.put("address", "上城区华光路1号");	// 停车场地址
-        paramJson.put("regionCode", "370281");	// 行政区划
-        paramJson.put("areaCode", "01");	// 城区编号
-        paramJson.put("priceType", 1);	//定价类型
-        paramJson.put("feeScale", "每辆每小时3 元。停车时间4----24 小时的，按不超过4 小时计收。");	// 收费标准
-        paramJson.put("openTime", "08: 00-20: 00");	// 开放时间
-        paramJson.put("parkingLocate", 1);	// 路内或路外，参见数 据字典 停车位置
-        paramJson.put("parkingType", 1);	// 停车场类型 公共或配建停车场，参见数据字典
-        paramJson.put("totalBerthNum", 30);	// 泊位总数
-        paramJson.put("openBerthNum", 30);	// 开放泊位数
-        paramJson.put("bmapX", "123.312543");	// 百度经度坐标
-        paramJson.put("bmapY", "43.127821");	//百度纬度坐标
-        paramJson.put("gmapX", "123.312543");	//高德经度坐标
-        paramJson.put("gmapY", "43.127821");	//高德纬度坐标
-        paramJson.put("tempTotalNum",30);	// 临停车位数
-        paramJson.put("intrinsicTotalNum", 0);	// 月租车位数
-        paramJson.put("visitorTotalNum", 0);	// 访客车位数
-        paramJson.put("chargeTotalNum", 0);	// 充电桩车位数
-        paramJson.put("uploadTime", "2024-09-01 09:10:05");	// 上传时间（格式：yyyy- MM- dd HH: mm: ss ）
+        paramJson.put("parkingCode", park.getPark_code());	// 停车场编号，该编号在场库系统中保证唯一
+        paramJson.put("parkingName", park.getPark_name());	// 停车场名称
+        paramJson.put("address", park.getAddress());	// 停车场地址
+        paramJson.put("regionCode",park.getCity());	// 行政区划
+        paramJson.put("areaCode", park.getArea_code());	// 城区编号
+        paramJson.put("priceType", park.getPrice_type());	//定价类型
+        paramJson.put("feeScale", park.getCharge_remark());	// 收费标准
+        paramJson.put("openTime", park.getOpenTime());	// 开放时间
+        paramJson.put("parkingLocate", park.getParkingLocate());	// 路内或路外，参见数 据字典 停车位置
+        paramJson.put("parkingType", park.getParkingType());	// 停车场类型 公共或配建停车场，参见数据字典
+        paramJson.put("totalBerthNum", park.getPark_num());	// 泊位总数
+        paramJson.put("openBerthNum", park.getOpenBerthNum());	// 开放泊位数
+        paramJson.put("bmapX", park.getLongitude());	// 百度经度坐标
+        paramJson.put("bmapY", park.getLatitude());	//百度纬度坐标
+        paramJson.put("gmapX", park.getLongitude());	//高德经度坐标
+        paramJson.put("gmapY", park.getLatitude());	//高德纬度坐标
+        paramJson.put("tempTotalNum",park.getTempTotalNum());	// 临停车位数
+        paramJson.put("intrinsicTotalNum", park.getIntrinsicTotalNum());	// 月租车位数
+        paramJson.put("visitorTotalNum", park.getVisitorTotalNum());	// 访客车位数
+        paramJson.put("chargeTotalNum", park.getChargeTotalNum());	// 充电桩车位数
+        paramJson.put("uploadTime", DateUtil.format(new Date(),"yyyy-MM-dd HH:mm:ss"));	// 上传时间（格式：yyyy-MM-dd HH:mm:ss ）
 
         JSONObject requestJson = new JSONObject();
         requestJson.put("data", paramJson.toString());
@@ -197,6 +199,7 @@ public class ParkService extends BaseService<ParkDao, Park> {
         log.info("发送信息：{}", paramMap.toString());
         String result = SecureUtil.doPost(Constants.URL + "/uploadParkingInfo", paramMap);
         log.info("result：" + result);
+        return result ;
     }
 
 

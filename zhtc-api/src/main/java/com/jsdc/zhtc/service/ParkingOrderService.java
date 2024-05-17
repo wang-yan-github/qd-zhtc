@@ -1,5 +1,7 @@
 package com.jsdc.zhtc.service;
 
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.bean.copier.CopyOptions;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.poi.excel.ExcelUtil;
 import cn.hutool.poi.excel.ExcelWriter;
@@ -720,6 +722,895 @@ public class ParkingOrderService extends BaseService<ParkingOrderDao, ParkingOrd
         } else {
             return ResultInfo.success("操作失败！");
         }
+    }
+    /**
+     * create by wp at 2022/2/11 9:05
+     * description: 停车场订单出场接口
+     *
+     * @param bean
+     * @return com.jsdc.zhtc.vo.ResultInfo
+     */
+    public ResultInfo exit(ParkingOrderVo bean) {
+        //========================驶出状态不为6
+        System.out.println("===========================驶出:" + bean.getEventType() + "=============================");
+        Park park = parkService.selectOne(Wrappers.<Park>lambdaQuery().eq(Park::getPark_code, bean.getParkCode()).eq(Park::getIs_del, GlobalData.ISDEL_NO));
+        ParkDevice parkDevice = parkDeviceService.selectOne(Wrappers.<ParkDevice>lambdaQuery().eq(ParkDevice::getPark_id, park.getId()).eq(ParkDevice::getDevice_code, bean.getOutChannelId()).eq(ParkDevice::getIs_del, GlobalData.ISDEL_NO));
+
+        if (null != parkDevice && StringUtils.equals(parkDevice.getPassageway(), "1")) {
+            logger.info("非出口生成订单");
+            return ResultInfo.error("非出口生成订单");
+        }
+
+        if (!GlobalData.EVENTTYPE.equals(bean.getEventType())) {
+            //白牌车辆直接放行，不生成订单
+            if (GlobalData.CAR_TYPE_WHITE.equals(bean.getCar_type())) {
+                // todo 抬杆
+                try {
+                    if (StringUtils.equals(park.getBrand(), "dc")) {
+                        String content = "";
+                        content += bean.getCar_no() + ",";
+                        content += "请缴费0元 一路顺风";
+                        parkingGateUtils.mqttOpenGate(parkDevice.getDevice_code(), content);
+                    }
+                } catch (Exception e) {
+                    logger.info(e.toString());
+                    return ResultInfo.success();
+                }
+                return ResultInfo.success();
+            }
+            if (null == parkDevice) {
+                logger.error("未查询到设备信息，device:" + bean.getOutChannelId());
+                return ResultInfo.error("未查询到设备信息，device:" + bean.getOutChannelId());
+            }
+
+            OperateCarno operateCarno = carnoService.selectOne(new QueryWrapper<OperateCarno>()
+                    .eq("car_no", bean.getCar_no()).eq("car_type", bean.getCar_type())
+                    .eq("is_del", "0"));
+            if (null != operateCarno) {
+                bean.setCarno_id(operateCarno.getId());
+                bean.setMember_id(operateCarno.getMember_id());
+            } else {
+                logger.info("未查询到车牌号：" + bean.getCar_no());
+                OperateCarno carno = new OperateCarno();
+                carno.setCar_no(bean.getCar_no());
+                carno.setCar_type(bean.getCar_type());
+                carno.setRoster_type(GlobalData.ROSTER_TYPE_ORDINARY);
+                carno.setCreate_time(new Date());
+                carno.setIs_del(GlobalData.ISDEL_NO);
+                carnoService.insert(carno);
+                bean.setCarno_id(carno.getId());
+            }
+            List<String> statusList = new ArrayList<>();
+            statusList.add(GlobalData.PARKING_ORDER_STOP);
+            statusList.add(GlobalData.PARKING_ORDER_ALREADYPAY);
+            statusList.add(GlobalData.PARKING_ORDER_STAYPAY);
+            List<ParkingOrder> parkingOrders = selectList(new QueryWrapper<ParkingOrder>()
+                    .in("status", statusList)
+                    .eq("is_del", "0")
+                    .eq("park_id", park.getId())
+                    .eq("carno_id", bean.getCarno_id())
+                    .orderByDesc("update_time"));
+            //判断是否是临时通行订单，如果是临时通行订单，则判断有没有再规定时间内驶离，
+            // 若未驶离，则把这条单据设置为已完成，新生成一条正常收费记录，
+            // 如果在规定时间内，则直接放行
+            ParkingOrder tempOrder = null;
+            if (parkingOrders != null && parkingOrders.size() > 0) {
+                if (GlobalData.FREETYPELSTX.equals(parkingOrders.get(0).getFree_type())) {
+                    tempOrder = parkingOrders.get(0);
+                    //判断当前时间是否在临时通行截止时间之内,驶出时间大于临停截止时间
+                    if (bean.getDriveout_time().after(tempOrder.getTempDriveOutTime())) {
+                        tempOrder.setStatus(GlobalData.PARKING_ORDER_COMPLETE);
+                        tempOrder.setUpdate_time(new Date());
+                        tempOrder.setSum_amount("0");
+                        tempOrder.setDiscount_amount("0");
+                        tempOrder.setPaid_amount("0");
+                        tempOrder.setDriveout_time(tempOrder.getTempDriveOutTime());
+                        tempOrder.setResitime(TimeUtils.computeMinute(tempOrder.getDrivein_time(), tempOrder.getDriveout_time()));
+                        tempOrder.setUnpaid_amount("0");
+                        tempOrder.updateById();
+                        //如果有需要计费的临时通行订单，设置成完成，所以应该把在停订单设置为空
+//                        parkingOrders = null;
+                    }
+                }
+            }
+            /**
+             * 如果在出场时没有查到该车辆任何的在停、待缴费、已缴费订单，则存在以下两种情况
+             * 1.无已完成订单：
+             *      场景：停车收费建成时车辆就在停车场内。
+             *      操作：直接开闸。
+             * 2.有已完成订单：
+             *      场景：车辆上一次出场后并未开出而是退回了停车场。
+             *      操作：取最近一次的已完成订单，用上一个订单的出场时间作为入场时间，用本次出场时间作为出场时间生成一个待支付订单。
+             * 3.如果是临时停车扫码之后未驶出，且需要缴费，则生成一条新计费订单，
+             */
+            if (CollectionUtils.isEmpty(parkingOrders)
+                    || (tempOrder != null && GlobalData.PARKING_ORDER_COMPLETE.equals(tempOrder.getStatus()))) {
+                List<ParkingOrder> completeOrders = selectList(Wrappers.<ParkingOrder>lambdaQuery()
+                        .eq(ParkingOrder::getIs_del, GlobalData.ISDEL_NO)
+                        .eq(ParkingOrder::getStatus, GlobalData.PARKING_ORDER_COMPLETE)
+                        .eq(ParkingOrder::getPark_id, park.getId())
+                        .eq(ParkingOrder::getCarno_id, bean.getCarno_id())
+                        .orderByDesc(ParkingOrder::getDriveout_time));
+                //找不到在停、代缴费、已缴费停车订单，也找不到已完成的停车订单
+                if (CollectionUtils.isEmpty(completeOrders)) {
+                    // todo 抬杆
+                    try {
+                        if (StringUtils.equals(park.getBrand(), "dc")) {
+                            String content = "";
+                            content += bean.getCar_no() + ",";
+                            content += "请缴费0元 一路顺风";
+                            parkingGateUtils.mqttOpenGate(parkDevice.getDevice_code(), content);
+                        } else {
+//                            parkingGateUtils.wxopenGate(park.getPark_code(), parkDevice.getChannel_id());
+                        }
+                    } catch (Exception e) {
+                        logger.info(e.toString());
+                    }
+                } else {
+                    //找不到在停、代缴费、已缴费停车订单，只能找到已完成的停车订单
+                    ParkingOrder parkingOrder = completeOrders.get(0);
+                    PaymentVo paymentVo = getParkingCharging(new AppealRecordVo(String.valueOf(parkingOrder.getId()), bean.getDriveout_time()));
+                    BigDecimal allAmount = new BigDecimal(paymentVo.getPay_money()).subtract(new BigDecimal(paymentVo.getDiscount_money()));
+                    BigDecimal paiedAmount = new BigDecimal(parkingOrder.getPaid_amount());
+                    //实际产生费用大于已支付费用，生成新订单
+                    if (allAmount.compareTo(paiedAmount) == 1) {
+                        Integer paymentId = parkingOrder.getPayment_id();
+                        //PaymentOrder paymentOrder = paymentOrderService.selectById(paymentId);
+                        String parkingIdByUUId = ParkingOrderUtils.getParkingIdByUUId(GlobalData.ROLE_P, park.getId());
+                        ParkingOrder newOrder = new ParkingOrder();
+
+                        newOrder.setSum_amount(allAmount.subtract(paiedAmount).toString());
+                        newOrder.setDiscount_amount("0");
+                        newOrder.setPaid_amount("0");
+                        newOrder.setUnpaid_amount(allAmount.subtract(paiedAmount).toString());
+                        //免费类型 0：包月 1：白名单 2：免费时段 3：特殊开闸
+                        if (parkingOrder.getFree_type().equals("0") || parkingOrder.getFree_type().equals("1")) {
+                            newOrder.setFree_type(parkingOrder.getFree_type());
+                            newOrder.setSum_amount("0");
+                            newOrder.setUnpaid_amount("0");
+                        }
+
+                        newOrder.setOrder_no(parkingIdByUUId);
+                        newOrder.setArea_id(park.getArea_id());
+                        newOrder.setStreet_id(park.getStreet_id());
+                        newOrder.setPark_id(park.getId());
+                        newOrder.setIs_del(GlobalData.ISDEL_NO);
+                        CarnoCompany companys = companyService.selectOne(new QueryWrapper<CarnoCompany>().eq("carno_id", bean.getCarno_id()));
+                        if (null != companys) {
+                            newOrder.setCompany_id(companys.getCompany_id());
+                        }
+                        //如果上一条是临时停车，则这次新增的记录，使用临停驶离截止时间当做新订单的驶入订单
+                        if (GlobalData.FREETYPELSTX.equals(parkingOrder.getFree_type())) {
+                            newOrder.setDrivein_time(parkingOrder.getTempDriveOutTime());
+                        } else {
+                            newOrder.setDrivein_time(parkingOrder.getDriveout_time());
+                        }
+                        newOrder.setCarno_id(operateCarno.getId());
+                        newOrder.setSource(parkingOrder.getSource());
+                        //
+                        if (GlobalData.FREETYPEBY.equals(parkingOrder.getFree_type()) || GlobalData.FREETYPEBMD.equals(parkingOrder.getFree_type()) || GlobalData.FREETYPEQYBY.equals(parkingOrder.getFree_type())) {
+                            newOrder.setStatus(GlobalData.PARKING_ORDER_COMPLETE);
+                        } else {
+                            newOrder.setStatus(GlobalData.PARKING_ORDER_STAYPAY);
+                        }
+
+                        newOrder.setIs_upload(GlobalData.ISUPLOAD);
+                        newOrder.setIs_merge("0");
+                        newOrder.setIs_invoice(GlobalData.ISUPLOAD);
+                        newOrder.setDriveout_gate(parkDevice.getDevice_code());
+                        newOrder.setDriveout_time(bean.getDriveout_time());
+                        newOrder.setResitime(TimeUtils.computeMinute(parkingOrder.getDriveout_time(), bean.getDriveout_time()));
+                        newOrder.setCreate_time(new Date());
+                        newOrder.setUpdate_time(new Date());
+                        insert(newOrder);
+                        List<ParkingOrderPics> detailsList = bean.getDetails();
+                        handlePictue(detailsList, newOrder.getId(), GlobalData.PARKING_DIRECTION_OUT);
+                        //路外车辆预出场上报 发送至市交平台
+                        Map<String, Object> map = new HashMap<>();
+                        map.put("orderNo", newOrder.getOrder_no());
+                        map.put("billId", "");
+                        Integer tempParkId = newOrder.getPark_id();
+                        Park park1 = null;
+                        if (null != tempParkId) {
+                            park1 = parkService.selectById(tempParkId);
+                            if (null != park1) {
+                                map.put("parkCode", park1.getTraffic_park_code());
+                            }
+                        }
+                        Integer tempCarno = newOrder.getCarno_id();
+                        OperateCarno operateCarno1 = null;
+                        if (null != tempCarno) {
+                            operateCarno1 = operateCarnoService.selectById(tempCarno);
+                            if (null != operateCarno1) {
+                                map.put("plateNo", operateCarno1.getCar_no());
+                            }
+                        }
+                        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                        map.put("enterTime", simpleDateFormat.format(newOrder.getDrivein_time()));
+                        map.put("costTime", simpleDateFormat.format(new Date()));
+                        map.put("parkPeriodTime", newOrder.getResitime());
+                        map.put("payStatus", 0);
+                        BigDecimal bigDecimal = new BigDecimal("100");
+                        String tempTotal = new BigDecimal(newOrder.getSum_amount()).multiply(bigDecimal).toString();
+                        String temp2 = tempTotal;
+                        if (tempTotal.contains(".")) {
+                            String[] temp1 = tempTotal.split("\\.");
+                            temp2 = temp1[0];
+                        }
+
+                        map.put("totalCost", Integer.parseInt(temp2));
+                        String freeMoney = new BigDecimal(newOrder.getDiscount_amount()).multiply(bigDecimal).toString();
+                        String temp4 = freeMoney;
+                        if (freeMoney.contains(".")) {
+                            String[] temp3 = freeMoney.split("\\.");
+                            temp4 = temp3[0];
+                        }
+
+                        map.put("freeMoney", Integer.parseInt(temp4));
+                        String preMoney = new BigDecimal(newOrder.getPaid_amount()).multiply(bigDecimal).toString();
+                        String temp6 = preMoney;
+                        if (preMoney.contains(".")) {
+                            String[] temp5 = preMoney.split("\\.");
+                            temp6 = temp5[0];
+                        }
+                        map.put("preMoney", Integer.parseInt(temp6));
+
+                        String payMoney = new BigDecimal(newOrder.getUnpaid_amount()).multiply(bigDecimal).toString();
+                        String temp8 = payMoney;
+                        if (payMoney.contains(".")) {
+                            String[] temp7 = payMoney.split("\\.");
+                            temp8 = temp7[0];
+                        }
+
+                        map.put("payMoney", Integer.parseInt(temp8));
+                        //TODO 上报交控
+                        try {
+                            TrafficControlUtils.postOuterCarPrePassOutData(map);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        if (GlobalData.FREETYPEBY.equals(parkingOrder.getFree_type()) || GlobalData.FREETYPEBMD.equals(parkingOrder.getFree_type()) || GlobalData.FREETYPEQYBY.equals(parkingOrder.getFree_type())) {
+                            // todo 抬杆
+                            /**
+                             * 判断该停车场是否开启限流
+                             * 限流开关 0开启 1关闭
+                             */
+                            if (notEmpty(park.getOn_off()) && park.getOn_off().equals("0")) {
+                                if (notEmpty(park.getFree_count())) {
+                                    //车辆驶离更新空闲车位+1
+                                    park.setFree_count(park.getFree_count() + 1);
+                                    parkService.updateById(park);
+                                }
+                            }
+                            try {
+                                if (StringUtils.equals(park.getBrand(), "dc")) {
+                                    String content = "";
+                                    content += bean.getCar_no() + ",";
+                                    content += "一路顺风";
+                                    parkingGateUtils.mqttOpenGate(parkDevice.getDevice_code(), content);
+                                }
+                            } catch (Exception e) {
+                                logger.info(e.toString());
+                            }
+                        }
+                        return ResultInfo.success();
+
+                    } else {
+                        // todo 抬杆
+                        /**
+                         * 判断该停车场是否开启限流
+                         * 限流开关 0开启 1关闭
+                         */
+                        if (notEmpty(park.getOn_off()) && park.getOn_off().equals("0")) {
+                            if (notEmpty(park.getFree_count())) {
+                                //车辆驶离更新空闲车位+1
+                                park.setFree_count(park.getFree_count() + 1);
+                                parkService.updateById(park);
+                            }
+                        }
+                        try {
+                            if (StringUtils.equals(park.getBrand(), "dc")) {
+                                String content = "";
+                                content += bean.getCar_no() + ",";
+                                content += "请缴费0元 一路顺风";
+                                parkingGateUtils.mqttOpenGate(parkDevice.getDevice_code(), content);
+                            }
+                        } catch (Exception e) {
+                            logger.info(e.toString());
+                        }
+                    }
+                }
+
+                return ResultInfo.success();
+            }
+            ParkingOrder parkingOrder = parkingOrders.get(0);
+            //如果该订单的免费类型为包月或白名单或者临时通行，则更新订单状态为已完成，各费用为0，然后开闸
+            if (GlobalData.FREETYPEBY.equals(parkingOrder.getFree_type())
+                    || GlobalData.FREETYPEBMD.equals(parkingOrder.getFree_type())
+                    || GlobalData.FREETYPELSTX.equals(parkingOrder.getFree_type())
+                    || GlobalData.FREETYPEQYBY.equals(parkingOrder.getFree_type())) {
+                parkingOrder.setStatus(GlobalData.PARKING_ORDER_COMPLETE);
+                parkingOrder.setUpdate_time(new Date());
+                parkingOrder.setSum_amount("0");
+                parkingOrder.setDiscount_amount("0");
+                parkingOrder.setPaid_amount("0");
+                parkingOrder.setDriveout_time(bean.getDriveout_time());
+                parkingOrder.setResitime(TimeUtils.computeMinute(parkingOrder.getDrivein_time(), parkingOrder.getDriveout_time()));
+                parkingOrder.setUnpaid_amount("0");
+
+                //上传驶离图片
+                List<ParkingOrderPics> detailsList = bean.getDetails();
+                handlePictue(detailsList, parkingOrder.getId(), GlobalData.PARKING_DIRECTION_OUT);
+                // todo 抬杆
+                /**
+                 * 判断该停车场是否开启限流
+                 * 限流开关 0开启 1关闭
+                 */
+                if (notEmpty(park.getOn_off()) && park.getOn_off().equals("0")) {
+                    if (notEmpty(park.getFree_count())) {
+                        //车辆驶离更新空闲车位+1
+                        park.setFree_count(park.getFree_count() + 1);
+                        parkService.updateById(park);
+                    }
+                }
+                try {
+                    if (StringUtils.equals(park.getBrand(), "dc")) {
+                        //包月车辆定制化语音播报
+                        if (GlobalData.FREETYPEBY.equals(parkingOrder.getFree_type())) {
+                            List<MonthlyManagement> monthlyManagements = monthlyManagementService.selectList(Wrappers.<MonthlyManagement>lambdaQuery()
+                                    .eq(MonthlyManagement::getCarno_id, bean.getCarno_id())
+                                    .eq(MonthlyManagement::getIs_del, GlobalData.IS_DEL_NO)
+                                    .eq(MonthlyManagement::getIsTheCompany, 1)
+                                    .orderByDesc(MonthlyManagement::getEnd_time));
+                            if (CollectionUtils.isNotEmpty(monthlyManagements)) {
+                                MonthlyManagement monthlyManagement = monthlyManagements.get(0);
+                                Long start = bean.getDriveout_time().getTime();
+                                Long end = monthlyManagement.getEnd_time().getTime();
+                                Long diffNm = end - start;
+                                Long diffDay = diffNm / 24 / 60 / 60 / 1000;
+
+                                String content = "";
+                                content += bean.getCar_no() + ",";
+                                content += "月租车 剩余" + (diffDay > 0 ? diffDay : 0) + "天 ";
+                                content += "一路顺风";
+                                parkingGateUtils.mqttOpenGate(parkDevice.getDevice_code(), content);
+                            } else {
+                                String content = "";
+                                content += bean.getCar_no() + ",";
+                                content += "请缴费0元 一路顺风";
+                                parkingGateUtils.mqttOpenGate(parkDevice.getDevice_code(), content);
+                            }
+                        } else {
+                            String content = "";
+                            content += bean.getCar_no() + ",";
+                            content += "请缴费0元 一路顺风";
+                            parkingGateUtils.mqttOpenGate(parkDevice.getDevice_code(), content);
+                        }
+
+                    }
+                    parkingOrder.setOperation_type_out(GlobalData.OPERATION_TYPE_REGULAR);
+                } catch (Exception e) {
+                    String content = "";
+                    content += bean.getCar_no() + ",";
+                    content += "请缴费0元 一路顺风";
+                    parkingGateUtils.mqttOpenGate(parkDevice.getDevice_code(), content);
+                    logger.info(e.toString());
+                }
+                updateById(parkingOrder);
+                //路外车辆预出场上报 发送至市交平台
+                Map<String, Object> map = new HashMap<>();
+                map.put("orderNo", parkingOrder.getOrder_no());
+                map.put("billId", parkingOrder.getId());
+                Integer tempParkId = parkingOrder.getPark_id();
+                Park park1 = null;
+                if (null != tempParkId) {
+                    park1 = parkService.selectById(tempParkId);
+                    if (null != park1) {
+                        map.put("parkCode", park1.getTraffic_park_code());
+                    }
+                }
+                Integer tempCarno = parkingOrder.getCarno_id();
+                OperateCarno operateCarno1 = null;
+                if (null != tempCarno) {
+                    operateCarno1 = operateCarnoService.selectById(tempCarno);
+                    if (null != operateCarno1) {
+                        map.put("plateNo", operateCarno1.getCar_no());
+                    }
+                }
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                map.put("enterTime", simpleDateFormat.format(parkingOrder.getDrivein_time()));
+                map.put("costTime", simpleDateFormat.format(new Date()));
+                map.put("parkPeriodTime", parkingOrder.getResitime());
+                map.put("payStatus", 1);
+                map.put("totalCost", 0);
+                map.put("freeMoney", 0);
+                map.put("preMoney", 0);
+                map.put("payMoney", 0);
+                //TODO 上报交控
+                try {
+                    TrafficControlUtils.postOuterCarPrePassOutData(map);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                //路外车辆出场记录 对接市交接口 同步数据
+                Map<String, Object> map1 = new HashMap<>();
+                map1.put("actTime", simpleDateFormat.format(new Date()));
+                map1.put("actType", 2);
+                if (null != park) {
+                    map1.put("parkCode", park.getTraffic_park_code());
+                }
+                map1.put("deviceCode", parkingOrder.getDriveout_gate());
+                if (null != operateCarno1) {
+                    map1.put("plateNo", operateCarno1.getCar_no());
+                }
+
+                Integer tempColor = 0;
+                if (operateCarno1.getCar_type().equals(GlobalData.CAR_TYPE_BLUE)) {
+                    tempColor = 1;
+                } else if (operateCarno1.getCar_type().equals(GlobalData.CAR_TYPE_GREEN)) {
+                    tempColor = 5;
+                } else if (operateCarno1.getCar_type().equals(GlobalData.CAR_TYPE_YELLOW)) {
+                    tempColor = 2;
+                } else if (operateCarno1.getCar_type().equals(GlobalData.CAR_TYPE_WHITE)) {
+                    tempColor = 4;
+                }
+                map1.put("plateColor", tempColor);
+                List<ParkingOrderPics> detailsListTemp = bean.getDetails();
+                if (CollectionUtils.isNotEmpty(detailsListTemp)) {
+                    String url = detailsListTemp.get(0).getPicture_url();
+                    map1.put("picUrl", loadPicPath2 + url);
+                }
+                //TODO 上报交控
+                try {
+                    TrafficControlUtils.postOuterCarPassOutData(map1);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                //上报泊位 对接市交接口
+                Map<String, Object> map2 = new HashMap<>();
+                map2.put("parkCode", park.getTraffic_park_code());
+                String tempTime = simpleDateFormat.format(new Date());
+                map2.put("createTime", tempTime);
+                map2.put("totalPlaceCount", park.getPark_num());
+                //停车场剩余泊位数
+                map2.put("reducePlaceCount", "");
+                //TODO 上报交控
+                try {
+                    TrafficControlUtils.postPlaceData(map2);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                return ResultInfo.success();
+            }
+            /**
+             * 车辆驶离时停车订单有可能存在两种状态：
+             * 1.在停状态，处于该状态说明车主并没有预付费，则在出厂时计算费用即可。
+             * 2.已缴费状态，处于该状态说明车主已进行预付费，该情况下会产生两种变化：
+             *      a.停车时长产生的实际费用超出预付费用；需生成新的停车订单，新订单的费用来源于停车总时长费用-预付费用。
+             *      b.停车时长产生的实际费用未超出预付费用；无需产生新的停车订单。
+             */
+            if (GlobalData.PARKING_ORDER_STOP.equals(parkingOrder.getStatus()) || GlobalData.PARKING_ORDER_STAYPAY.equals(parkingOrder.getStatus())) {//车辆在停或待缴费
+                BeanUtil.copyProperties(bean, parkingOrder, CopyOptions.create().setIgnoreNullValue(true).setIgnoreError(true));
+                PaymentVo paymentVo = getParkingCharging(new AppealRecordVo(String.valueOf(parkingOrder.getId()), bean.getDriveout_time()));
+                //查询是否有商家优惠(需要单独增加商家优惠多少和商家是否进行了优惠)
+//                PaymentVo vos = roadParkingOrderService.selectBusinessCarno(operateCarno.getId(), operateCarno.getCar_no(),
+//                        operateCarno.getCar_type(), String.valueOf(parkingOrder.getId()), 1, bean.getDriveout_time(), paymentVo.getPay_money());
+//                if ("1".equals(vos.getStatus()) || "2".equals(vos.getStatus())) {
+//                    paymentVo.setPay_money(vos.getZf_money());
+//                    parkingOrder.setIs_discount("0");//是
+//                    parkingOrder.setDiscount_money(vos.getDiscount_money());//优惠金额
+//                }
+                parkingOrder.setResitime(TimeUtils.computeMinute(parkingOrder.getDrivein_time(), bean.getDriveout_time()));
+                //收费金额计算
+                if (new BigDecimal(paymentVo.getPay_money()).compareTo(BigDecimal.ZERO) == 0) {
+                    parkingOrder.setFree_type(GlobalData.FREETYPETIME);
+                    parkingOrder.setStatus(GlobalData.PARKING_ORDER_COMPLETE);
+                    parkingOrder.setUpdate_time(new Date());
+                    parkingOrder.setSum_amount("0");
+                    parkingOrder.setDiscount_amount("0");
+                    parkingOrder.setPaid_amount("0");
+                    parkingOrder.setUnpaid_amount("0");
+                    //处理图片
+                    List<ParkingOrderPics> detailsList = bean.getDetails();
+                    handlePictue(detailsList, parkingOrder.getId(), GlobalData.PARKING_DIRECTION_OUT);
+                    // todo 抬杆
+                    /**
+                     * 判断该停车场是否开启限流
+                     * 限流开关 0开启 1关闭
+                     */
+                    if (notEmpty(park.getOn_off()) && park.getOn_off().equals("0")) {
+                        if (notEmpty(park.getFree_count())) {
+                            //车辆驶离更新空闲车位+1
+                            park.setFree_count(park.getFree_count() + 1);
+                            parkService.updateById(park);
+                        }
+                    }
+                    try {
+                        if (StringUtils.equals(park.getBrand(), "dc")) {
+                            String content = "";
+                            content += bean.getCar_no() + ",";
+                            content += "请缴费0元 一路顺风";
+                            parkingGateUtils.mqttOpenGate(parkDevice.getDevice_code(), content);
+                        }
+                        parkingOrder.setOperation_type_out(GlobalData.OPERATION_TYPE_REGULAR);
+                    } catch (Exception e) {
+                        logger.info(e.toString());
+                    }
+                    updateById(parkingOrder);
+
+
+                    //路外车辆出场记录 对接市交接口 同步数据
+                    Map<String, Object> map1 = new HashMap<>();
+                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                    map1.put("actTime", simpleDateFormat.format(new Date()));
+                    map1.put("actType", 2);
+                    Park park1 = null;
+                    Integer tempParkId = parkingOrder.getPark_id();
+                    if (null != tempParkId) {
+                        park1 = parkService.selectById(tempParkId);
+                    }
+                    if (null != park1) {
+                        map1.put("parkCode", park1.getTraffic_park_code());
+                    }
+                    Integer tempCarno = parkingOrder.getCarno_id();
+                    OperateCarno operateCarno1 = null;
+                    if (null != tempCarno) {
+                        operateCarno1 = operateCarnoService.selectById(tempCarno);
+                    }
+                    map1.put("deviceCode", parkingOrder.getDriveout_gate());
+                    if (null != operateCarno1) {
+                        map1.put("plateNo", operateCarno1.getCar_no());
+                    }
+                    Integer tempColor = 0;
+                    if (operateCarno1.getCar_type().equals(GlobalData.CAR_TYPE_BLUE)) {
+                        tempColor = 1;
+                    } else if (operateCarno1.getCar_type().equals(GlobalData.CAR_TYPE_GREEN)) {
+                        tempColor = 5;
+                    } else if (operateCarno1.getCar_type().equals(GlobalData.CAR_TYPE_YELLOW)) {
+                        tempColor = 2;
+                    } else if (operateCarno1.getCar_type().equals(GlobalData.CAR_TYPE_WHITE)) {
+                        tempColor = 4;
+                    }
+                    map1.put("plateColor", tempColor);
+                    List<ParkingOrderPics> detailsListTemp = bean.getDetails();
+                    if (CollectionUtils.isNotEmpty(detailsListTemp)) {
+                        String url = detailsListTemp.get(0).getPicture_url();
+                        map1.put("picUrl", loadPicPath2 + url);
+                    }
+                    //TODO 上报交控
+                    try {
+                        TrafficControlUtils.postOuterCarPassOutData(map1);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                    //上报泊位 对接市交接口
+                    Map<String, Object> map2 = new HashMap<>();
+                    map2.put("parkCode", park.getTraffic_park_code());
+                    String tempTime = simpleDateFormat.format(new Date());
+                    map2.put("createTime", tempTime);
+                    map2.put("totalPlaceCount", park.getPark_num());
+                    //停车场剩余泊位数
+                    map2.put("reducePlaceCount", "");
+                    //TODO 上报交控
+                    try {
+                        TrafficControlUtils.postPlaceData(map2);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                    return ResultInfo.success();
+                }
+                parkingOrder.setSum_amount(paymentVo.getPay_money());
+                parkingOrder.setDiscount_amount(paymentVo.getDiscount_money());
+                parkingOrder.setPaid_amount("0");
+                parkingOrder.setUnpaid_amount(new BigDecimal(paymentVo.getPay_money()).subtract(new BigDecimal(paymentVo.getDiscount_money())).toString());
+                parkingOrder.setStatus(GlobalData.PARKING_ORDER_STAYPAY);
+                parkingOrder.setUpdate_time(new Date());
+                parkingOrder.setDriveout_gate(parkDevice.getDevice_code());
+                parkingOrder.setDriveout_time(bean.getDriveout_time());
+                if (updateById(parkingOrder) > 0) {
+                    //图片保存操作
+                    //处理图片
+                    List<ParkingOrderPics> detailsList = bean.getDetails();
+                    handlePictue(detailsList, parkingOrder.getId(), GlobalData.PARKING_DIRECTION_OUT);
+
+                    //路外车辆预出场上报 发送至市交平台
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("orderNo", parkingOrder.getOrder_no());
+                    map.put("billId", parkingOrder.getId());
+                    Integer tempParkId = parkingOrder.getPark_id();
+                    Park park1 = null;
+                    if (null != tempParkId) {
+                        park1 = parkService.selectById(tempParkId);
+                        if (null != park1) {
+                            map.put("parkCode", park1.getTraffic_park_code());
+                        }
+                    }
+                    Integer tempCarno = parkingOrder.getCarno_id();
+                    OperateCarno operateCarno1 = null;
+                    if (null != tempCarno) {
+                        operateCarno1 = operateCarnoService.selectById(tempCarno);
+                        if (null != operateCarno1) {
+                            map.put("plateNo", operateCarno1.getCar_no());
+                        }
+                    }
+                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    map.put("enterTime", simpleDateFormat.format(parkingOrder.getDrivein_time()));
+                    map.put("costTime", simpleDateFormat.format(new Date()));
+                    map.put("parkPeriodTime", parkingOrder.getResitime());
+                    map.put("payStatus", 0);
+                    BigDecimal bigDecimal = new BigDecimal("100");
+                    String tempTotal = new BigDecimal(parkingOrder.getSum_amount()).multiply(bigDecimal).toString();
+                    String temp2 = tempTotal;
+                    if (tempTotal.contains(".")) {
+                        String[] temp1 = tempTotal.split("\\.");
+                        temp2 = temp1[0];
+                    }
+
+                    map.put("totalCost", Integer.parseInt(temp2));
+
+                    String freeMoney = new BigDecimal(parkingOrder.getDiscount_amount()).multiply(bigDecimal).toString();
+                    String temp4 = freeMoney;
+                    if (freeMoney.contains(".")) {
+                        String[] temp3 = freeMoney.split("\\.");
+                        temp4 = temp3[0];
+                    }
+
+                    map.put("freeMoney", Integer.parseInt(temp4));
+
+                    String preMoney = new BigDecimal(parkingOrder.getPaid_amount()).multiply(bigDecimal).toString();
+                    String temp6 = preMoney;
+                    if (preMoney.contains(".")) {
+                        String[] temp5 = preMoney.split("\\.");
+                        temp6 = temp5[0];
+                    }
+                    map.put("preMoney", Integer.parseInt(temp6));
+
+                    String payMoney = new BigDecimal(parkingOrder.getUnpaid_amount()).multiply(bigDecimal).toString();
+                    String temp8 = payMoney;
+                    if (payMoney.contains(".")) {
+                        String[] temp7 = payMoney.split("\\.");
+                        temp8 = temp7[0];
+                    }
+                    map.put("payMoney", Integer.parseInt(temp8));
+                    //TODO 上报交控
+                    try {
+                        TrafficControlUtils.postOuterCarPrePassOutData(map);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                    String unpaid = new BigDecimal(paymentVo.getPay_money()).subtract(new BigDecimal(paymentVo.getDiscount_money())).toString().toString();
+                    if (StringUtils.equals(park.getBrand(), "dc")) {
+                        String content = "";
+                        content += bean.getCar_no() + ",";
+                        content += "请缴费" + unpaid + "元";
+                        parkingGateUtils.mqttVoice(parkDevice.getDevice_code(), content);
+                    }
+
+                    return ResultInfo.success();
+                } else {
+                    return ResultInfo.success();
+                }
+            } else if (GlobalData.PARKING_ORDER_ALREADYPAY.equals(parkingOrder.getStatus()) || GlobalData.PARKING_ORDER_COMPLETE.equals(parkingOrder.getStatus())) {//已缴费
+                PaymentVo paymentVo = getParkingCharging(new AppealRecordVo(String.valueOf(parkingOrder.getId()), bean.getDriveout_time()));
+                BigDecimal allAmount = new BigDecimal(paymentVo.getPay_money()).subtract(new BigDecimal(paymentVo.getDiscount_money()));
+                BigDecimal paiedAmount = new BigDecimal(parkingOrder.getPaid_amount());
+                //实际产生费用大于已支付费用，生成新订单
+                if (allAmount.compareTo(paiedAmount) == 1) {
+                    Integer paymentId = parkingOrder.getPayment_id();
+                    PaymentOrder paymentOrder = paymentOrderService.selectById(paymentId);
+                    String parkingIdByUUId = ParkingOrderUtils.getParkingIdByUUId(GlobalData.ROLE_P, park.getId());
+                    ParkingOrder newOrder = new ParkingOrder();
+                    newOrder.setOrder_no(parkingIdByUUId);
+                    newOrder.setArea_id(park.getArea_id());
+                    newOrder.setStreet_id(park.getStreet_id());
+                    newOrder.setPark_id(park.getId());
+                    newOrder.setIs_del(GlobalData.ISDEL_NO);
+                    CarnoCompany companys = companyService.selectOne(new QueryWrapper<CarnoCompany>().eq("carno_id", bean.getCarno_id()));
+                    if (null != companys) {
+                        newOrder.setCompany_id(companys.getCompany_id());
+                    }
+                    newOrder.setDrivein_time(paymentOrder.getCreate_time());
+                    newOrder.setCarno_id(operateCarno.getId());
+                    newOrder.setSource(parkingOrder.getSource());
+                    newOrder.setStatus(GlobalData.PARKING_ORDER_STAYPAY);
+                    newOrder.setSum_amount(allAmount.subtract(paiedAmount).toString());
+                    newOrder.setDiscount_amount("0");
+                    newOrder.setPaid_amount("0");
+                    newOrder.setUnpaid_amount(allAmount.subtract(paiedAmount).toString());
+                    newOrder.setIs_upload(GlobalData.ISUPLOAD);
+                    newOrder.setIs_merge("0");
+                    newOrder.setIs_invoice(GlobalData.ISUPLOAD);
+                    newOrder.setDriveout_gate(parkDevice.getDevice_code());
+                    newOrder.setDriveout_time(bean.getDriveout_time());
+                    newOrder.setResitime(TimeUtils.computeMinute(paymentOrder.getCreate_time(), bean.getDriveout_time()));
+                    newOrder.setCreate_time(new Date());
+                    newOrder.setUpdate_time(new Date());
+                    insert(newOrder);
+
+
+                    //路外车辆预出场上报 发送至市交平台
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("orderNo", newOrder.getOrder_no());
+                    map.put("billId", parkingOrder.getId());
+                    Integer tempParkId = newOrder.getPark_id();
+                    Park park1 = null;
+                    if (null != tempParkId) {
+                        park1 = parkService.selectById(tempParkId);
+                        if (null != park1) {
+                            map.put("parkCode", park1.getTraffic_park_code());
+                        }
+                    }
+                    Integer tempCarno = newOrder.getCarno_id();
+                    OperateCarno operateCarno1 = null;
+                    if (null != tempCarno) {
+                        operateCarno1 = operateCarnoService.selectById(tempCarno);
+                        if (null != operateCarno1) {
+                            map.put("plateNo", operateCarno1.getCar_no());
+                        }
+                    }
+                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    map.put("enterTime", simpleDateFormat.format(newOrder.getDrivein_time()));
+                    map.put("costTime", simpleDateFormat.format(new Date()));
+                    map.put("parkPeriodTime", newOrder.getResitime());
+                    map.put("payStatus", 0);
+                    BigDecimal bigDecimal = new BigDecimal("100");
+                    String tempTotal = new BigDecimal(newOrder.getSum_amount()).multiply(bigDecimal).toString();
+                    String temp2 = tempTotal;
+                    if (tempTotal.contains(".")) {
+                        String[] temp1 = tempTotal.split("\\.");
+                        temp2 = temp1[0];
+                    }
+
+                    map.put("totalCost", Integer.parseInt(temp2));
+                    String freeMoney = new BigDecimal(newOrder.getDiscount_amount()).multiply(bigDecimal).toString();
+                    String temp4 = freeMoney;
+                    if (freeMoney.contains(".")) {
+                        String[] temp3 = freeMoney.split("\\.");
+                        temp4 = temp3[0];
+                    }
+
+                    map.put("freeMoney", Integer.parseInt(temp4));
+                    String preMoney = new BigDecimal(newOrder.getPaid_amount()).multiply(bigDecimal).toString();
+                    String temp6 = preMoney;
+                    if (preMoney.contains(".")) {
+                        String[] temp5 = preMoney.split("\\.");
+                        temp6 = temp5[0];
+                    }
+                    map.put("preMoney", Integer.parseInt(temp6));
+
+                    String payMoney = new BigDecimal(newOrder.getUnpaid_amount()).multiply(bigDecimal).toString();
+                    String temp8 = payMoney;
+                    if (payMoney.contains(".")) {
+                        String[] temp7 = payMoney.split("\\.");
+                        temp8 = temp7[0];
+                    }
+
+                    map.put("payMoney", Integer.parseInt(temp8));
+                    //TODO 上报交控
+                    try {
+                        TrafficControlUtils.postOuterCarPrePassOutData(map);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                    parkingOrder.setStatus(GlobalData.PARKING_ORDER_COMPLETE);
+                    parkingOrder.setDriveout_time(paymentOrder.getCreate_time());
+                    parkingOrder.setUpdate_time(new Date());
+                    parkingOrder.setResitime(TimeUtils.computeMinute(parkingOrder.getDrivein_time(), parkingOrder.getDriveout_time()));
+                    //处理图片
+                    List<ParkingOrderPics> detailsList = bean.getDetails();
+                    handlePictue(detailsList, parkingOrder.getId(), GlobalData.PARKING_DIRECTION_OUT);
+                    updateById(parkingOrder);
+
+                    if (StringUtils.equals(park.getBrand(), "dc")) {
+                        String unpaid = allAmount.subtract(paiedAmount).toString().toString();
+                        String content = "";
+                        content += bean.getCar_no() + ",";
+                        content += "请缴费" + unpaid + "元";
+                        parkingGateUtils.mqttVoice(parkDevice.getDevice_code(), content);
+                    }
+                    return ResultInfo.success();
+
+                } else {
+                    //订单置为已完成
+                    BeanUtil.copyProperties(bean, parkingOrder, CopyOptions.create().setIgnoreNullValue(true).setIgnoreError(true));
+                    parkingOrder.setResitime(TimeUtils.computeMinute(parkingOrder.getDrivein_time(), parkingOrder.getDriveout_time()));
+                    parkingOrder.setStatus(GlobalData.PARKING_ORDER_COMPLETE);
+                    parkingOrder.setUpdate_time(new Date());
+                    //处理图片
+                    List<ParkingOrderPics> detailsList = bean.getDetails();
+                    handlePictue(detailsList, parkingOrder.getId(), GlobalData.PARKING_DIRECTION_OUT);
+
+
+                    //路外车辆出场记录 对接市交接口 同步数据
+                    Map<String, Object> map1 = new HashMap<>();
+                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    map1.put("actTime", simpleDateFormat.format(new Date()));
+                    map1.put("actType", 2);
+                    Integer tempParkId = parkingOrder.getPark_id();
+                    Park park1 = null;
+                    if (null != tempParkId) {
+                        park1 = parkService.selectById(tempParkId);
+                    }
+                    if (null != park1) {
+                        map1.put("parkCode", park1.getTraffic_park_code());
+                    }
+                    map1.put("deviceCode", parkingOrder.getDriveout_gate());
+
+                    Integer tempCarno = parkingOrder.getCarno_id();
+                    OperateCarno operateCarno1 = null;
+                    if (null != tempCarno) {
+                        operateCarno1 = operateCarnoService.selectById(tempCarno);
+                    }
+
+                    if (null != operateCarno1) {
+                        map1.put("plateNo", operateCarno1.getCar_no());
+                    }
+
+                    Integer tempColor = 0;
+                    if (operateCarno1.getCar_type().equals(GlobalData.CAR_TYPE_BLUE)) {
+                        tempColor = 1;
+                    } else if (operateCarno1.getCar_type().equals(GlobalData.CAR_TYPE_GREEN)) {
+                        tempColor = 5;
+                    } else if (operateCarno1.getCar_type().equals(GlobalData.CAR_TYPE_YELLOW)) {
+                        tempColor = 2;
+                    } else if (operateCarno1.getCar_type().equals(GlobalData.CAR_TYPE_WHITE)) {
+                        tempColor = 4;
+                    }
+                    map1.put("plateColor", tempColor);
+                    List<ParkingOrderPics> detailsListTemp = bean.getDetails();
+                    if (CollectionUtils.isNotEmpty(detailsListTemp)) {
+                        String url = detailsListTemp.get(0).getPicture_url();
+                        map1.put("picUrl", loadPicPath2 + url);
+                    }
+                    //TODO 上报交控
+                    try {
+                        TrafficControlUtils.postOuterCarPassOutData(map1);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                    //上报泊位 对接市交接口
+                    Map<String, Object> map2 = new HashMap<>();
+                    map2.put("parkCode", park.getTraffic_park_code());
+                    String tempTime = simpleDateFormat.format(new Date());
+                    map2.put("createTime", tempTime);
+                    map2.put("totalPlaceCount", park.getPark_num());
+                    //停车场剩余泊位数
+                    map2.put("reducePlaceCount", "");
+                    //TODO 上报交控
+                    try {
+                        TrafficControlUtils.postPlaceData(map2);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    // todo 开闸
+                    try {
+                        if (StringUtils.equals(park.getBrand(), "dc")) {
+                            String content = "";
+                            content += bean.getCar_no() + ",";
+                            content += "已缴费 一路顺风";
+                            parkingGateUtils.mqttOpenGate(parkDevice.getDevice_code(), content);
+                        }
+                        parkingOrder.setOperation_type_out(GlobalData.OPERATION_TYPE_REGULAR);
+                    } catch (Exception e) {
+                        logger.info(e.toString());
+                    }
+                    updateById(parkingOrder);
+                    return ResultInfo.success();
+                }
+            }
+            return ResultInfo.success();
+        } else {
+//            return opengateSave(bean.getBerth(), GlobalData.PARKING_DIRECTION_OUT);
+        }
+        return null;
     }
 
     /**
