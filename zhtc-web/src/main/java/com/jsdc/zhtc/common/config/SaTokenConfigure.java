@@ -26,7 +26,7 @@ public class SaTokenConfigure implements WebMvcConfigurer {
             }
 //            SaHolder.getResponse().redirect("/login.do");
 //            SaRouter.back();
-        })).addPathPatterns("/**").excludePathPatterns("/dc/**", "/mqtt/addTopic", "/video/**", "/test/**", "/scan/**", "/login.do", "/login", "/ums/**", "/fileManage/**", "/parkingplat/**", "/bs/**", "/pay/**", "/parkingapi/newapi/**", "/common/exceldownload/**", "/sysPosappManager/downloadFile/**", "/sysPosappManager/getVersion/**", "/sjfx/**", "/sjfxNew/**", "/lib/**", "/api/**", "/parkingplat/**", "/notice/**", "/roadParkingApi/**", "/provisionalPass/**", "/provisionalPassRecord/**");
+        })).excludePathPatterns("/**/**");
     }
 
     @Bean

@@ -2,10 +2,10 @@ package com.jsdc.zhtc.service;
 
 import cn.afterturn.easypoi.excel.ExcelExportUtil;
 import cn.afterturn.easypoi.excel.entity.TemplateExportParams;
-import cn.hutool.core.lang.UUID;
+import cn.hutool.core.util.IdUtil;
 import cn.hutool.poi.excel.ExcelReader;
 import cn.hutool.poi.excel.ExcelUtil;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jsdc.core.base.BaseService;
@@ -50,14 +50,16 @@ public class CarOwnerService extends BaseService<CarOwnerDao, CarOwner> {
             PageHelper.startPage(data.getPageNum(), data.getPageSize());
 
         }
+        LambdaQueryWrapper<CarOwner> wrapper = new LambdaQueryWrapper<>();
         CarOwner bean = data.getBean();
+        if (null != bean) {
+            wrapper.eq(StringUtils.isNotEmpty(bean.getType()), CarOwner::getType, bean.getType());
+            wrapper.like(StringUtils.isNotEmpty(bean.getName()), CarOwner::getName, bean.getName());
+            wrapper.like(StringUtils.isNotEmpty(bean.getPhone()), CarOwner::getPhone, bean.getPhone());
+        }
 
-        QueryWrapper<CarOwner> wrapper = new QueryWrapper<>();
-        wrapper.eq("type", bean.getType());
-        wrapper.like("name", bean.getName());
-        wrapper.like("phone", bean.getPhone());
-        wrapper.eq("is_del", GlobalData.ISDEL_NO);
-        wrapper.orderByDesc("create_time");
+        wrapper.eq(CarOwner::getIs_del, GlobalData.ISDEL_NO);
+        wrapper.orderByDesc(CarOwner::getCreate_time);
 
         List<CarOwner> lists = selectList(wrapper);
 
@@ -66,7 +68,7 @@ public class CarOwnerService extends BaseService<CarOwnerDao, CarOwner> {
             carOwner.setType_name(sysDictMap.get(carOwner.getType()));
         }
 
-        PageInfo<CarOwner> listPage  = new PageInfo<>(lists);
+        PageInfo<CarOwner> listPage = new PageInfo<>(lists);
         return listPage;
     }
 
@@ -87,7 +89,7 @@ public class CarOwnerService extends BaseService<CarOwnerDao, CarOwner> {
      */
     public ResultInfo saveData(CarOwner bean) {
         SysUser sysUser = sysUserService.getUser();
-        bean.setId(String.valueOf(UUID.randomUUID()));
+        bean.setId(IdUtil.simpleUUID());
         bean.setIs_del(GlobalData.ISDEL_NO);
         bean.setCreate_time(new Date());
         bean.setUpdate_user(sysUser.getId());
