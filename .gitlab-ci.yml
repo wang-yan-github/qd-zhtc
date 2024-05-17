@@ -19,9 +19,6 @@ cache:
     - $API_PATH/target/
     - $API_MQTT_PATH/target/
 
-before_script:
-  - apt-get install -y build-essential libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev
-
 # 阶段
 stages:
   - maven install
@@ -129,6 +126,8 @@ npm install:
     - echo "=============== 开始安装任务  ==============="
     - cd $WEB_PATH
     - ls -l
+    - apt-get update -qq
+    - apt-get install -y build-essential libcairo2-dev pango1.0-tools libjpeg-dev libgif-dev librsvg2-dev
     - npm install --legacy-peer-deps
     - ls -l
     - echo "=============== 执行结束 ==================="
