@@ -60,7 +60,7 @@ public class CarOwnerService extends BaseService<CarOwnerDao, CarOwner> {
 
         List<CarOwner> lists = selectList(wrapper);
 
-        Map<String, String> sysDictMap = sysDictService.getSysDictMap(GlobalData.CAR_OWNER_TYPE);
+        Map<String, String> sysDictMap = sysDictService.getLabel(GlobalData.CAR_OWNER_TYPE);
         for (CarOwner carOwner : lists) {
             carOwner.setType_name(sysDictMap.get(carOwner.getType()));
         }
@@ -147,18 +147,19 @@ public class CarOwnerService extends BaseService<CarOwnerDao, CarOwner> {
             return ResultInfo.error("请检查文件后，重新导入！");
         }
         ExcelReader reader = ExcelUtil.getReader(inputStream);
-        List<Map<String, Object>> readAll = reader.read(1, 1, Integer.MAX_VALUE);
+        List<Map<String, Object>> readAll = reader.read(2, 2, Integer.MAX_VALUE);
         if (readAll.isEmpty()) {
             return ResultInfo.error("空白模板，请填写内容！");
         }
 
         SysUser sysUser = sysUserService.getUser();
-        for (int i = 2; i < readAll.size(); i++) {
+        Map<String, String> sysDictMap = sysDictService.getValue(GlobalData.CAR_OWNER_TYPE);
+        for (int i = 0; i < readAll.size(); i++) {
             Map<String, Object> quMap = readAll.get(i);
             //获取表格中的数据
             String type = String.valueOf(quMap.get("车主属性"));
             if (StringUtils.isNotEmpty(type)) {
-                if (!type.equals("内部人员") && !type.equals("其他")) {
+                if (StringUtils.isEmpty(sysDictMap.get(type))) {
                     return ResultInfo.error("请选择正确选择车主属性,第" + (i + 1) + "行");
                 }
             } else {

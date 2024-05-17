@@ -165,12 +165,21 @@ public class SysDictService extends BaseService<SysDictDao, SysDict> {
         return ResultInfo.success();
     }
 
-    public Map<String,String> getSysDictMap(String dict_type){
+    public Map<String,String> getLabel(String dict_type){
         QueryWrapper<SysDict> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("dict_type", dict_type);
         queryWrapper.eq("is_del", 0);
         List<SysDict> sysDictList = selectList(queryWrapper);
         Map<String,String> sysDictMap = sysDictList.stream().collect(Collectors.toMap(SysDict::getDc_value,SysDict::getLabel));
+        return sysDictMap;
+    }
+
+    public Map<String,String> getValue(String dict_type){
+        QueryWrapper<SysDict> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("dict_type", dict_type);
+        queryWrapper.eq("is_del", 0);
+        List<SysDict> sysDictList = selectList(queryWrapper);
+        Map<String,String> sysDictMap = sysDictList.stream().collect(Collectors.toMap(SysDict::getLabel,SysDict::getDc_value));
         return sysDictMap;
     }
 }
