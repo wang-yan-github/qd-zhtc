@@ -146,7 +146,8 @@ npm install:
     - echo "deb http://mirrors.aliyun.com/debian buster-updates main contrib non-free" >> /etc/apt/sources.list
     - apt-get update -qq
     - apt-get install -y build-essential libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev
-    - pnpm install --legacy-peer-deps --verbose
+    - npm install --global pnpm
+    - pnpm install --legacy-peer-deps
     - ls -l
     - echo "=============== 执行结束 ==================="
 
