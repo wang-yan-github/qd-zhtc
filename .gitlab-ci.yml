@@ -11,11 +11,7 @@ variables:
 # 缓存
 cache:
   paths:
-    - $WEB_PATH/node_modules/
-    - $WEB_PATH/dist/
     - .m2/repository
-    - $API_PATH/target/
-    - $API_MQTT_PATH/target/
 
 # 阶段
 stages:
