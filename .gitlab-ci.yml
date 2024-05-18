@@ -142,7 +142,7 @@ npm install:
     - cd $WEB_PATH
     - ls -l
     - npm install --global pnpm
-    - pnpm install --legacy-peer-deps
+    - pnpm install
     - ls -l
     - echo "=============== 执行结束 ==================="
 
