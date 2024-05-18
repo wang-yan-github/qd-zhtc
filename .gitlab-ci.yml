@@ -141,6 +141,7 @@ npm install:
     - echo "=============== 开始安装任务  ==============="
     - cd $WEB_PATH
     - ls -l
+    - apt-get install libpango1.0-dev
     - npm install canvas@2.9.3 --build-from-source --legacy-peer-deps
     - npm install --global pnpm
     - pnpm install
