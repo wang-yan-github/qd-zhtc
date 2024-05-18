@@ -151,7 +151,6 @@ npm install:
     - ls -l
     - echo "=============== 执行结束 ==================="
 
-
 build vue:
   image: node:18
   stage: build vue
