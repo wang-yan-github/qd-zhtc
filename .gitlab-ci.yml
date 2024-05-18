@@ -10,7 +10,6 @@ variables:
 
 # 缓存
 cache:
-  key: ${CI_BUILD_REF_NAME}
   paths:
     - $WEB_PATH/node_modules/
     - $WEB_PATH/dist/
