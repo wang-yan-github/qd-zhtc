@@ -133,7 +133,7 @@ npm install:
   stage: npm install
   cache:
     paths:
-      - $WEB_PATH/target/
+      - $WEB_PATH/node_modules/
   only:
     - install
     - npm-install
@@ -156,7 +156,7 @@ build vue:
   stage: build vue
   cache:
     paths:
-      - $WEB_PATH/target/
+      - $WEB_PATH/node_modules/
   only:
     - build
   script:
