@@ -220,4 +220,6 @@ public class GlobalData {
 
     //车主管理-车主属性
     public String CAR_OWNER_TYPE = "car_owner_type";
+    //减免规则管理-类型
+    public String RULE_CONFIGURATION_TYPE = "rule_configuration_type";
 }
