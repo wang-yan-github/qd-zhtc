@@ -129,7 +129,7 @@ deploy mqtt jar:
     - echo "=============== 执行结束 ==================="
 
 npm install:
-  image: node:14
+  image: node:16
   stage: npm install
   cache:
     paths:
@@ -152,7 +152,7 @@ npm install:
     - echo "=============== 执行结束 ==================="
 
 build vue:
-  image: node:14
+  image: node:16
   stage: build vue
   cache:
     paths:
