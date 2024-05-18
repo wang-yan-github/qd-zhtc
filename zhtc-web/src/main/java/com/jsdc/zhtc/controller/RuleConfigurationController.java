@@ -10,10 +10,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * 车主管理
+ * 减免规则管理
  */
 @Controller
-@RequestMapping("/RuleConfiguration")
+@RequestMapping("/ruleConfiguration")
 public class RuleConfigurationController {
 
     @Autowired
