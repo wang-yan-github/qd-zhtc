@@ -141,9 +141,9 @@ npm install:
     - echo "=============== 开始安装任务  ==============="
     - cd $WEB_PATH
     - ls -l
-    - echo "deb http://mirrors.tuna.tsinghua.edu.cn/debian/ bookworm main contrib non-free" > /etc/apt/sources.list
-    - echo "deb http://mirrors.tuna.tsinghua.edu.cn/debian/ bookworm-updates main contrib non-free" >> /etc/apt/sources.list
-    - echo "deb http://mirrors.tuna.tsinghua.edu.cn/debian/ bookworm-security main contrib non-free" >> /etc/apt/sources.list
+    - echo "deb http://mirrors.aliyun.com/debian buster main contrib non-free" > /etc/apt/sources.list
+    - echo "deb http://mirrors.aliyun.com/debian-security buster/updates main contrib non-free" >> /etc/apt/sources.list
+    - echo "deb http://mirrors.aliyun.com/debian buster-updates main contrib non-free" >> /etc/apt/sources.list
     - apt-get update
     - apt-get install libpango1.0-dev
     - npm install canvas@2.9.3 --build-from-source --legacy-peer-deps
