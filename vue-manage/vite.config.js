@@ -17,7 +17,7 @@ export default {
         host: '0.0.0.0',
         proxy: {
             '/dev': {
-                target: 'http://172.168.10.63:8080',
+                target: 'http://qd-zhtc-web.wangyan.zone',
                 changeOrigin: true,
                 rewrite: path => path.replace(/^\/dev/, '')
             },

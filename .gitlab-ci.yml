@@ -2,11 +2,11 @@
 variables:
   MAVEN_CLI_OPTS: "-s .m2/settings-nexus.xml --batch-mode -Dmaven.test.skip=true -Dmaven.repo.local=.m2/repository -DaltDeploymentRepository=wangyan_hosted::default::http://nexus:8081/repository/wangyan_hosted"
   API_PATH: 'zhtc-web'
-  API_NAME: 'qd-zhtc-web'
+  API_NAME: 'qd-zhtc-web.wangyan.zone'
   API_MQTT_PATH: 'zhtc-mqtt'
-  API_MQTT_NAME: 'qd-zhtc-mqtt'
+  API_MQTT_NAME: 'qd-zhtc-mqtt.wangyan.zone'
   WEB_PATH: 'vue-manage'
-  WEB_NAME: 'qd-zhtc'
+  WEB_NAME: 'qd-zhtc.wangyan.zone'
 
 # 缓存 所有分支共享缓存
 cache:
