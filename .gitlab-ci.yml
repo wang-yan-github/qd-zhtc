@@ -8,8 +8,9 @@ variables:
   WEB_PATH: 'vue-manage'
   WEB_NAME: 'qd-zhtc'
 
-# 缓存
+# 缓存 所有分支共享缓存
 cache:
+  key: "shared-cache"
   paths:
     - .m2/repository
 
