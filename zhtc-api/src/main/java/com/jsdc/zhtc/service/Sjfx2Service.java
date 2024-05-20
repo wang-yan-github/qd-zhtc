@@ -34,10 +34,6 @@ public class Sjfx2Service {
     private ParkDeviceService parkDeviceService;
 
     @Autowired
-    private MonthlyManagementService monthlyManagementService;
-    @Autowired
-    private RechargeManagementService rechargeManagementService;
-    @Autowired
     private RefundManagementService refundManagementService;
     @Autowired
     private PaymentOrderService paymentOrderService;
@@ -47,8 +43,6 @@ public class Sjfx2Service {
     private OperateAppealService operateAppealService;
     @Autowired
     private OperateCarnoService operateCarnoService;
-    @Autowired
-    private CarnoAppealService carnoAppealService;
     @Autowired
     private AppealHandleRecordService appealHandleRecordService;
     @Autowired
@@ -467,26 +461,26 @@ public class Sjfx2Service {
         wrapper4.eq("CONVERT(varchar, create_time, 23)", new DateTime().plusDays(-1).toString("yyyy-MM-dd"));
         Long yesterday_appealcount = operateAppealService.selectCount(wrapper4);
         jsonObject.put("yesterday_appealcount", yesterday_appealcount);
-
-        //车牌申诉：总咨询量 今日/昨日
-        QueryWrapper<CarnoAppeal> wrapper5 = new QueryWrapper<>();
-        wrapper5.eq("is_del", 0);
-//        wrapper5.eq("CONVERT(varchar, create_time, 23)", new DateTime().toString("yyyy-MM-dd"));
-        Long today_carnocount = carnoAppealService.selectCount(wrapper5);
-        jsonObject.put("today_carnocount", today_carnocount);
-
-        QueryWrapper<CarnoAppeal> wrapper6 = new QueryWrapper<>();
-        wrapper6.eq("is_del", 0);
-        wrapper6.eq("CONVERT(varchar, create_time, 23)", new DateTime().plusDays(-1).toString("yyyy-MM-dd"));
-        Long yesterday_carnocount = carnoAppealService.selectCount(wrapper6);
-        jsonObject.put("yesterday_carnocount", yesterday_carnocount);
+//
+//        //车牌申诉：总咨询量 今日/昨日
+//        QueryWrapper<CarnoAppeal> wrapper5 = new QueryWrapper<>();
+//        wrapper5.eq("is_del", 0);
+////        wrapper5.eq("CONVERT(varchar, create_time, 23)", new DateTime().toString("yyyy-MM-dd"));
+//        Long today_carnocount = carnoAppealService.selectCount(wrapper5);
+//        jsonObject.put("today_carnocount", today_carnocount);
+//
+//        QueryWrapper<CarnoAppeal> wrapper6 = new QueryWrapper<>();
+//        wrapper6.eq("is_del", 0);
+//        wrapper6.eq("CONVERT(varchar, create_time, 23)", new DateTime().plusDays(-1).toString("yyyy-MM-dd"));
+//        Long yesterday_carnocount = carnoAppealService.selectCount(wrapper6);
+//        jsonObject.put("yesterday_carnocount", yesterday_carnocount);
 
         //折线图：近七日服务类型趋势 车主反馈 最近7日/数量
         jsonObject.put("operateFeedbackData", operateFeedbackService.getDaysCount());
         //折线图：近七日服务类型趋势 订单申诉 最近7日/数量
         jsonObject.put("operateAppealData", operateAppealService.getDaysCount());
         //折线图：近七日服务类型趋势 车牌申诉 最近7日/数量
-        jsonObject.put("carnoAppealData", carnoAppealService.getDaysCount());
+//        jsonObject.put("carnoAppealData", carnoAppealService.getDaysCount());
 
         //订单申诉处置方式：1.结束时间处理 2.订单费用处理 3.退款处理 5.修正车牌处理
         List<ReportVo> list = appealHandleRecordService.getCountByType();

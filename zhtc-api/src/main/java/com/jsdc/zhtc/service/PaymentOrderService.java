@@ -48,8 +48,6 @@ public class PaymentOrderService extends BaseService<PaymentOrderDao, PaymentOrd
     @Autowired
     SysUserService sysUserService;
     @Autowired
-    private InspectManageService manageService;
-    @Autowired
     private WxPay wxPay;
     @Autowired
     private WxPayConfigService configService;
@@ -141,9 +139,7 @@ public class PaymentOrderService extends BaseService<PaymentOrderDao, PaymentOrd
                     b.setPayment_resource(paymentResource_map.get(b.getPayment_resource()).getLabel());
                 }
                 b.setStatus(paymentType_map.get(b.getStatus()).getLabel());
-                if (notEmpty(b.getInspect_id())) {
-                    b.setInspect_name(manageService.selectById(b.getInspect_id()).getName());
-                }
+
             }
         }
         return payments;

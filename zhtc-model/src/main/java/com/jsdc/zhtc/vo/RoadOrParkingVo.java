@@ -91,8 +91,7 @@ public class RoadOrParkingVo {
     //申诉反馈记录
     AppealNoticeFeedback appealNoticeFeedback;
     List<AppealNoticeFeedback> appealNoticeFeedbacks;
-    //发票记录
-    InvoicesManagement management;
+
     //是否有申诉订单
     private Integer isAppeals;
     //运营人员审批状态

@@ -33,11 +33,8 @@ import static com.jsdc.core.base.Base.empty;
 import static com.jsdc.core.base.Base.notEmpty;
 
 /**
- * @projectName: zhtc
- * @className: MessageRcvCallBack
- * @author: wp
- * @description:
- * @date: 2023/7/7 14:43
+ * 停车场设备推送驶入驶出和心跳
+ * mqtt回调方法
  */
 public class MessageRcvCallBack implements MqttCallback {
 
@@ -103,21 +100,20 @@ public class MessageRcvCallBack implements MqttCallback {
         String deviceCode = Arrays.asList(topic.split("/")).get(2);
         ParkDevice parkDevice = deviceService.selectOne(Wrappers.<ParkDevice>lambdaQuery().eq(ParkDevice::getDevice_code, deviceCode).eq(ParkDevice::getIs_del, GlobalData.IS_DEL_NO));
         if (StringUtils.equals(parkDevice.getPassageway(), "1")) {
-            System.out.println("车辆驶入---------");
+            logger.info("车辆驶入---------");
             parkIn(deviceCode, jsonObject.toJSONString());
         } else if (StringUtils.equals(parkDevice.getPassageway(), "0")) {
-            System.out.println("车辆驶出---------");
+            logger.info("车辆驶出---------");
             parkOut(deviceCode, jsonObject.toJSONString());
         }
     }
 
     public void parkIn(String deviceCode, String data) {
         try {
-//            data = new String(data.getBytes(), StandardCharsets.UTF_8);
-
             DcParkInfo dcParkInfo = JSON.parseObject(data, DcParkInfo.class);
             ParkingOrderVo vo = new ParkingOrderVo();
 
+            //驶入图片
             List<ParkingOrderPics> list = new ArrayList<>();
             String base64 = dcParkInfo.getFull_pic();
             ParkingOrderPics parkingOrderPics = new ParkingOrderPics();
@@ -125,7 +121,10 @@ public class MessageRcvCallBack implements MqttCallback {
             parkingOrderPics.setBase64(base64);
             list.add(parkingOrderPics);
             vo.setDetails(list);
+
+            //车牌号码
             vo.setCar_no(StringUtils.isEmpty(dcParkInfo.getPlate_num()) ? "" : dcParkInfo.getPlate_num().toUpperCase());
+            //车牌类型(1蓝牌、2绿牌、3黄牌、4白牌 5黑牌)
             switch (dcParkInfo.getPlate_color()) {
                 case "蓝色":
                     vo.setCar_type("1");
@@ -139,26 +138,48 @@ public class MessageRcvCallBack implements MqttCallback {
                 case "绿色":
                     vo.setCar_type("2");
                     break;
+                case "黑色":
+                    vo.setCar_type("5");
+                    break;
                 default:
                     vo.setCar_type("1");
                     break;
             }
+
+            //根据驶入闸机设备编号和停车场id查询设备
             ParkDevice parkDevice = deviceService.selectOne(Wrappers.<ParkDevice>lambdaQuery().eq(ParkDevice::getDevice_code, deviceCode).eq(ParkDevice::getIs_del, GlobalData.IS_DEL_NO));
-            if (null == parkDevice) {
+            if (empty(parkDevice)) {
                 logger.error("未查询到设备信息，设备编码: " + deviceCode);
                 return;
             }
+
+            // 通道口 0：出口 1.入口
+            if (StringUtils.equals(parkDevice.getPassageway(), "0")) {
+                logger.error("非入口生成订单");
+                return;
+            }
+
+            //查询停车场
             Park park = parkService.selectById(parkDevice.getPark_id());
-            vo.setParkCode(park.getPark_code());
-            vo.setDrivein_gate(deviceCode);
+            if (empty(park)) {
+                logger.error("未查询到停车场信息，parkId:" + parkDevice.getPark_id());
+                return;
+            }
+
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-            vo.setDrivein_time(dateFormat.parse(dcParkInfo.getLocal_time()));
-            vo.setSource(GlobalData.PARKING_SOURCE_CAMERA);
+
+            vo.setParkCode(park.getPark_code());//停车场编号
+            vo.setPark_id(park.getId());//停车场id
+            vo.setDrivein_gate(deviceCode);  //驶入闸机设备编号
+
+            vo.setDrivein_time(dateFormat.parse(dcParkInfo.getLocal_time())); //进场时间
+            vo.setSource(GlobalData.PARKING_SOURCE_CAMERA);  //订单来源：摄像机
 
             String topic = "/a1BkUFnh0eA/" + deviceCode + "/user/get";
             String voiceTopic = "/a1BkUFnh0eA/" + deviceCode + "/user/get";
 
             String content = "";
+
             /**
              * 判断该停车场是否开启限流
              * 限流开关 0开启 1关闭
@@ -166,7 +187,7 @@ public class MessageRcvCallBack implements MqttCallback {
             if (notEmpty(park.getOn_off()) && park.getOn_off().equals("0")) {
                 if (notEmpty(park.getFree_count()) && park.getFree_count() <= 0) {
                     //语音提示该停车场车位已满，无法驶入
-                    if(StringUtils.equals(park.getBrand(), "dc")){
+                    if (StringUtils.equals(park.getBrand(), "dc")) {
                         content = "停车场车位已满";
                         parkingGateUtils.mqttVoice(parkDevice.getDevice_code(), content);
                     }
@@ -174,15 +195,18 @@ public class MessageRcvCallBack implements MqttCallback {
 //                    return ResultInfo.error("语音提示该停车场车位已满，无法驶入");
                 }
             }
+
             if (empty(content)) {
 //                GateCtrl.open(topic, voiceTopic, "pub_client_104", vo.getCar_no() + ",欢迎光临");
-            GateCtrl.open(topic, voiceTopic, "pub_client", vo.getCar_no() + ",欢迎光临");
-                parkingOrderService.entry(vo);
+                GateCtrl.open(topic, voiceTopic, "pub_client", vo.getCar_no() + ",欢迎光临");
+                parkingOrderService.entry(vo, park, parkDevice);
             }
         } catch (ParseException e) {
             e.printStackTrace();
+            logger.error("parkIn，驶入异常");
         }
     }
+
     public void parkOut(String deviceCode, String data) {
         try {
             logger.info("车辆驶出");

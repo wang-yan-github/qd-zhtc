@@ -29,14 +29,7 @@ public class PcMsgManagerController extends BaseController {
     private OperateAppealService operateAppealService;
 
     @Autowired
-    private CarnoAppealService carnoAppealService;
-
-    @Autowired
     private OperateFeedbackService operateFeedbackService;
-
-    @Autowired
-    private InspectFeedbackService inspectFeedbackService;
-
 
     @RequestMapping(value = "toManager.do", method = RequestMethod.GET)
     @ResponseBody
@@ -61,7 +54,7 @@ public class PcMsgManagerController extends BaseController {
                 //申诉订单
                 msgManagerVo.setOperate_order_num(operateAppealService.census(msgManagerVo));
                 // 申诉车牌
-                msgManagerVo.setOperate_car_no_num(carnoAppealService.census());
+//                msgManagerVo.setOperate_car_no_num(carnoAppealService.census());
                 // 车主反馈建议
                 msgManagerVo.setOperate_feedback_num(operateFeedbackService.census());
             }
@@ -73,11 +66,11 @@ public class PcMsgManagerController extends BaseController {
             //申诉订单
             msgManagerVo.setOperate_order_num(operateAppealService.census(msgManagerVo));
             // 申诉车牌
-            msgManagerVo.setOperate_car_no_num(carnoAppealService.census());
+//            msgManagerVo.setOperate_car_no_num(carnoAppealService.census());
             // 车主反馈建议
             msgManagerVo.setOperate_feedback_num(operateFeedbackService.census());
             // 巡检员上报
-            msgManagerVo.setInspect_feedback_num(inspectFeedbackService.census());
+//            msgManagerVo.setInspect_feedback_num(inspectFeedbackService.census());
 //            }
         }
 

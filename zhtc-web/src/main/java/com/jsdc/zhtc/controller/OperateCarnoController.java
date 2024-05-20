@@ -3,8 +3,6 @@ package com.jsdc.zhtc.controller;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.github.pagehelper.PageInfo;
 import com.jsdc.core.base.BaseController;
-import com.jsdc.zhtc.common.aop.logaop.LogInfo;
-import com.jsdc.zhtc.enums.LogEnums;
 import com.jsdc.zhtc.model.OperateCarno;
 import com.jsdc.zhtc.model.SysDict;
 import com.jsdc.zhtc.service.OperateCarnoService;
@@ -24,14 +22,11 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URLEncoder;
 import java.util.HashMap;
-import java.util.List;
 
 /**
- * ClassName: OperateCarnoController
- * Description:车牌管理表
- * date: 2021/12/30 10:33
+ * 车牌管理
  *
- * @author zln
+ * @author thr
  */
 @Controller
 @RequestMapping("/operatecarno")
@@ -40,82 +35,48 @@ public class OperateCarnoController extends BaseController {
     @Autowired
     private OperateCarnoService carnoService;
 
-    @PostMapping("/getMemberAll")
-    @ResponseBody
-    public ResultInfo getMemberAll(OperateCarno bean) {
-        List<OperateCarno> operateCarnos = carnoService.getMemberAll(bean);
-        return ResultInfo.success(operateCarnos);
-    }
-
     /**
-     * 查询车牌全数据，车牌绑定记录可复用
-     *
-     * @param operateCarnoVo
-     * @return
-     */
-    @RequestMapping(value = "getAll.do", method = RequestMethod.POST)
-    @ResponseBody
-    public ResultInfo getAll(OperateCarnoVo operateCarnoVo) {
-
-        return ResultInfo.success(carnoService.toList(operateCarnoVo));
-
-    }
-
-    /**
-     * 列表查询
-     *
-     * @param pageIndex
-     * @param pageSize
-     * @param operateCarnoVo
-     * @return
-     * @author bn
+     * 车牌列表分页查询
      */
     @RequestMapping(value = "toList.do", method = RequestMethod.POST)
     @ResponseBody
     public ResultInfo toList(@RequestParam(defaultValue = "1") Integer pageIndex,
-                             @RequestParam(defaultValue = "10") Integer pageSize, OperateCarnoVo operateCarnoVo) {
-
-
+                             @RequestParam(defaultValue = "10") Integer pageSize,
+                             OperateCarnoVo operateCarnoVo) {
         PageInfo<OperateCarnoVo> memberManageList = carnoService.toList(pageIndex, pageSize, operateCarnoVo);
-
         return ResultInfo.success(memberManageList);
     }
 
+    /**
+     * 车牌列表查询
+     */
+    @RequestMapping(value = "getList.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ResultInfo getList(OperateCarnoVo operateCarnoVo) {
+        return ResultInfo.success(carnoService.getList(operateCarnoVo));
+    }
+
+    /**
+     *白名单已选车辆列表
+     * @author wzn
+     * @date 2024/5/18 10:18
+     */
+    @RequestMapping(value = "carList", method = RequestMethod.POST)
+    @ResponseBody
+    public ResultInfo carList(@RequestBody OperateCarnoVo operateCarnoVo) {
+        return ResultInfo.success(carnoService.carList(operateCarnoVo.getParkId(),operateCarnoVo.getName(),operateCarnoVo.getCarNo()));
+    }
+
+
+    /**
+     * 车牌列表导出
+     */
     @RequestMapping(value = "export.do", method = RequestMethod.POST)
     public void export(OperateCarnoVo operateCarnoVo, HttpServletResponse response) {
         carnoService.export(operateCarnoVo, response);
-
     }
 
     /**
-     * 解除绑定
-     *
-     * @param carnoId
-     * @return
-     */
-    @RequestMapping(value = "relieveBind")
-    @ResponseBody
-    public ResultInfo relieveBind(Integer carnoId) {
-        ResultInfo resultInfo = carnoService.relieveBind(carnoId);
-        return resultInfo;
-    }
-
-    /**
-     * 编辑车牌信息：如白名单，残疾人等
-     *
-     * @param operateCarno
-     * @return
-     * @author bn
-     */
-    @RequestMapping(value = "toEdit.do", method = RequestMethod.POST)
-    @ResponseBody
-    @LogInfo(LogEnums.LOG_UPDCARNO)
-    public ResultInfo toEdit(@RequestBody OperateCarno operateCarno) {
-        return carnoService.edit(operateCarno);
-    }
-
-    /**
-     * pc端
      * 新增、修改车牌保存方法
      */
     @RequestMapping(value = "save.json")
@@ -124,17 +85,26 @@ public class OperateCarnoController extends BaseController {
         return carnoService.save(bean);
     }
 
-    @RequestMapping(value = "getDictsByType")
+    /**
+     * 详情
+     */
+    @RequestMapping(value = "view.json")
     @ResponseBody
-    public ResultInfo getDictsByType(String type) {
-        return ResultInfo.success(DcCacheDataUtil.getDictByDictType(type));
+    public ResultInfo view(@RequestBody OperateCarno bean) {
+        return carnoService.view(bean);
+    }
+
+    /**
+     * 删除
+     */
+    @RequestMapping(value = "del.json")
+    @ResponseBody
+    public ResultInfo del(@RequestBody OperateCarno bean) {
+        return carnoService.del(bean);
     }
 
     /**
      * 获取详情
-     *
-     * @param carno
-     * @return
      */
     @RequestMapping(value = "getDetail")
     @ResponseBody
@@ -157,39 +127,16 @@ public class OperateCarnoController extends BaseController {
     }
 
     /**
-     * create by wp at 2022/1/12 14:38
-     * description: 车辆绑定个人用户
-     *
-     * @param carId
-     * @param memberId
-     * @return com.jsdc.zhtc.vo.ResultInfo
+     * 获取字典数据列表
      */
-
-    @RequestMapping("bindCarPerson.do")
+    @RequestMapping(value = "getDictsByType")
     @ResponseBody
-    public ResultInfo bindCarPerson(Integer carId, Integer memberId) {
-        return carnoService.bindCarPerson(carId, memberId);
+    public ResultInfo getDictsByType(String type) {
+        return ResultInfo.success(DcCacheDataUtil.getDictByDictType(type));
     }
 
     /**
-     * 描 述： TODO(用户添加车牌)
-     * 作 者： lw
-     * 历 史： (版本) 作者 时间 注释
-     *
-     * @param bean
-     * @return {@link ResultInfo}
-     */
-    @PostMapping("/saveData")
-    public ResultInfo saveData(@RequestBody OperateCarno bean) {
-        return carnoService.saveData(bean);
-    }
-
-    /**
-     * description: 批量增加白名单
-     * * 作 者： xuaolong
-     *
-     * @param batchAddWhiteCarno
-     * @returncom.jsdc.zhtc.vo.ResultInfo
+     * 批量增加白名单
      */
     @RequestMapping(value = "/saveBeathWhiteCarNo", method = RequestMethod.POST)
     @ResponseBody
@@ -202,19 +149,7 @@ public class OperateCarnoController extends BaseController {
     }
 
     /**
-     * Excel导入白名单
-     * author wh
-     *
-     * @param file
-     * @return
-     */
-
-    /**
      * Excel白名单模板下载
-     * author wh
-     *
-     * @param response
-     * @return
      */
     @RequestMapping("downloadWhite")
     public void downloadWhite(HttpServletResponse response) {
@@ -240,24 +175,6 @@ public class OperateCarnoController extends BaseController {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    /**
-     * 详情
-     */
-    @RequestMapping(value = "view.json")
-    @ResponseBody
-    public ResultInfo view(@RequestBody OperateCarno bean) {
-        return carnoService.view(bean);
-    }
-
-    /**
-     * 删除
-     */
-    @RequestMapping(value = "del.json")
-    @ResponseBody
-    public ResultInfo del(@RequestBody OperateCarno bean) {
-        return carnoService.del(bean);
     }
 
 }

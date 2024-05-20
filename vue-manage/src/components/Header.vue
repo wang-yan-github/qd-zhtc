@@ -535,7 +535,7 @@ export default {
           //ElMessage.success("切换成功");
           menuType.value = "1";
           localStorage.setItem("menuType", "1");
-          ElMessage({ duration: 1000, message: "切换成功", type: "success" });
+          // ElMessage({ duration: 1000, message: "切换成功", type: "success" });
         } else {
           ElMessage({ duration: 2000, message: "切换失败", type: "error" });
         }

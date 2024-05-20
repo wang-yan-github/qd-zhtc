@@ -39,7 +39,7 @@ public class ParkingOrderPics extends Model<ParkingOrderPics> implements Seriali
     private Integer id;
     //图片路径
     private String picture_url;
-    //图片类型
+    //图片类型 1驶入 2驶出
     private String picture_type;
     //停车订单ID
     private Integer parking_order_id;

@@ -1,5 +1,7 @@
 package com.jsdc.zhtc.service;
 
+import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.github.pagehelper.PageHelper;
 import com.jsdc.core.base.Base;
@@ -8,6 +10,7 @@ import com.jsdc.zhtc.common.constants.GlobalData;
 import com.jsdc.zhtc.dao.ParkingReleaseDao;
 import com.jsdc.zhtc.mapper.ParkingReleaseMapper;
 import com.jsdc.zhtc.mapper.ParkingReleasePlaceMapper;
+import com.jsdc.zhtc.model.Park;
 import com.jsdc.zhtc.model.ParkingRelease;
 import com.jsdc.zhtc.model.ParkingReleasePlace;
 import com.jsdc.zhtc.vo.ParkingReleaseVo;
@@ -16,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -38,7 +42,8 @@ public class ParkingReleaseService extends BaseService<ParkingReleaseDao, Parkin
     private SysUserService sysUserService;
     @Autowired
     private ParkingReleaseMapper releaseMapper;
-
+    @Autowired
+    private ParkService parkService;
 
     /**
      * 分页查询
@@ -139,6 +144,36 @@ public class ParkingReleaseService extends BaseService<ParkingReleaseDao, Parkin
                 }
             }
         }
+    }
+    public ResultInfo selectByListData(ParkingReleaseVo bean) {
+        JSONObject object = new JSONObject();
+        //获取总配置数据
+        List<Integer> zd_parkings = placeService.selectByParkingReleaseId(null);
+        List<Integer> hx_list = new ArrayList<>();//回显list
+        if (null != bean.getId()) {
+            List<Integer> parkings = placeService.selectByParkingReleaseId(bean.getId());
+            for (Integer a : zd_parkings) {
+                if (!parkings.contains(a)) {
+                    hx_list.add(a);
+                }
+            }
+            object.put("parkings", parkings);
+            ParkingRelease release = selectById(bean.getId());
+            object.put("release", release);
+        } else {
+            hx_list.addAll(zd_parkings);
+        }
+
+            List<Park> list = parkService.selectList(new QueryWrapper<Park>().eq("is_del", "0"));
+            List<Park> park_list = new ArrayList<>();
+            list.forEach(a -> {
+                if (!hx_list.contains(a.getId())) {
+                    park_list.add(a);
+                }
+            });
+            object.put("list", park_list);
+            object.put("name", "park");
+        return ResultInfo.success(object);
     }
 
 

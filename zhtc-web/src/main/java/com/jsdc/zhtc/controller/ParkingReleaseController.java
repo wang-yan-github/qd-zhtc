@@ -35,7 +35,11 @@ public class ParkingReleaseController extends BaseController {
         List<ParkingReleaseVo> list = parkingReleaseService.selectPageList(pageIndex, pageSize, bean);
         return ResultInfo.success(new PageInfo<>(list));
     }
-
+    @RequestMapping(value = "selectByListData.json")
+    @ResponseBody
+    public ResultInfo selectByListData(ParkingReleaseVo bean) {
+        return parkingReleaseService.selectByListData(bean);
+    }
     //新增、修改保存方法
     @RequestMapping(value = "save.json")
     @ResponseBody

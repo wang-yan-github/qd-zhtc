@@ -1,7 +1,9 @@
 package com.jsdc.zhtc.service;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.jsdc.core.base.BaseService;
+import com.jsdc.zhtc.common.constants.GlobalData;
 import com.jsdc.zhtc.dao.ParkingReleasePlaceDao;
 import com.jsdc.zhtc.mapper.ParkingReleasePlaceMapper;
 import com.jsdc.zhtc.model.ParkingRelease;
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * ClassName: ParkingReleasePlaceService
@@ -52,7 +55,16 @@ public class ParkingReleasePlaceService extends BaseService<ParkingReleasePlaceD
         }
     }
 
-
+    public List<Integer> selectByParkingReleaseId(Integer parking_release_id) {
+        LambdaQueryWrapper<ParkingReleasePlace> wrapper = new LambdaQueryWrapper();
+        if (null != parking_release_id) {
+            wrapper.eq(ParkingReleasePlace::getParking_release_id, parking_release_id);
+        }
+        wrapper.eq(ParkingReleasePlace::getIs_del, GlobalData.ISDEL_NO);
+        wrapper.eq(ParkingReleasePlace::getParking_type, "1");
+        List<ParkingReleasePlace> list = selectList(wrapper);
+        return list.stream().map(x -> x.getParkingplace_id()).collect(Collectors.toList());
+    }
     /**
      * create by zonglina at 2022/1/12 13:29
      * description:根据收费id查询信息

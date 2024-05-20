@@ -44,7 +44,7 @@ public class ParkingOrderVo extends ParkingOrder {
     private String park_name;
     //状态
     private String state_name;
-    //车牌类型
+    //车牌类型(1蓝牌、2绿牌、3黄牌、4白牌)
     private String car_type;
     //订单来源
     private String source_type;

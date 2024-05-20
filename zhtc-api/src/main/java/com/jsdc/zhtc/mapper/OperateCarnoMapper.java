@@ -11,13 +11,13 @@ import java.util.List;
 
 @Mapper
 public interface OperateCarnoMapper extends BaseMapper<OperateCarno> {
+
     @SelectProvider(method = "toList", type = OperateCarnoDao.class)
     List<OperateCarnoVo> toList(OperateCarnoVo operateCarnoVo);
 
-    @SelectProvider(method = "getWhiteCarnoParks", type = OperateCarnoDao.class)
-    List<String> getWhiteCarnoParks(Integer carnoId);
 
-    @SelectProvider(method = "getParkCarno", type = OperateCarnoDao.class)
-    List<Integer> getParkCarno(Integer parkId);
+    @SelectProvider(method = "carList", type = OperateCarnoDao.class)
+    List<OperateCarnoVo> carList(String parkId, String name, String carNo);
+
 
 }

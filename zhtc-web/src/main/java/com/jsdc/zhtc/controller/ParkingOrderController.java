@@ -130,18 +130,6 @@ public class ParkingOrderController extends BaseController {
         return ResultInfo.success(parkingOrderService.orderDetails(id));
     }
 
-    /**
-     * 根据订单id查询与之相关的合并订单信息
-     *
-     * @param orderId
-     * @return
-     */
-    @RequestMapping("getMergeOrder.do")
-    @ResponseBody
-    public ResultInfo getMergeOrder(Integer orderId) {
-        return ResultInfo.success(parkingOrderService.getMergeOrder(orderId));
-    }
-
 
     /**
      * 现金核销列表
@@ -156,21 +144,6 @@ public class ParkingOrderController extends BaseController {
     public ResultInfo selectHxPageList(Integer pageIndex, Integer pageSize, ParkingOrderVo bean) {
         return parkingOrderService.selectHxPageList(bean, pageIndex, pageSize);
     }
-
-    /**
-     * 现金核销
-     * 全部核销
-     * thr
-     *
-     * @return
-     */
-    @RequestMapping("hxAll.do")
-    @ResponseBody
-    @LogInfo(LogEnums.LOG_INVOICECASH)
-    public ResultInfo hxAll(Integer xjyId, String startDate, String endDate) {
-        return parkingOrderService.hxAll(xjyId, startDate, endDate);
-    }
-
 
     /**
      * 描 述： TODO(根据条件获取订单)

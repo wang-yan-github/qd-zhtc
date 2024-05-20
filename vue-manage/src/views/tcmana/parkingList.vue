@@ -7,7 +7,7 @@
             type="primary"
             size="small"
             icon="el-icon-plus"
-            @click="handleEdit(0, null, true)"
+            @click="handleEdit()"
             v-permission="'park_parkinglist_add'"
             >添加
           </el-button>
@@ -200,7 +200,7 @@
               size="mini"
               type="text"
               icon="el-icon-edit"
-              @click="handleEdit(scope.$index, scope.row, false)"
+              @click="handleEdit(scope.row)"
               v-permission="'park_parkinglist_edit'"
               >编辑
             </el-button>
@@ -277,247 +277,6 @@
         ></el-pagination>
       </div>
     </div>
-
-    <!-- 编辑弹出框 -->
-    <el-dialog
-      :title="result.dialogT"
-      v-model="editVisible"
-      width="650px"
-      top="2vh"
-      destroy-on-close="true"
-      :close-on-click-modal="false"
-      @closed="cancleEdit"
-    >
-      <el-tabs type="card" v-model="activeName">
-        <el-tab-pane label="停车场信息" name="first">
-          <div class="mt10"></div>
-          <el-form
-            label-width="100px"
-            size="small"
-            :rules="formRules"
-            :model="form"
-          >
-            <el-row :gutter="20">
-              <el-col :span="12">
-                <el-form-item label="停车场编号" prop="park_code">
-                  <el-input
-                    v-model="form.park_code"
-                    placeholder="输入停车场编号"
-                  ></el-input>
-                </el-form-item>
-              </el-col>
-              <el-col :span="12">
-                <el-form-item label="停车场名称" prop="park_name">
-                  <el-input
-                    v-model="form.park_name"
-                    placeholder="输入停车场名称"
-                  ></el-input>
-                </el-form-item>
-              </el-col>
-              <el-col :span="12">
-                <el-form-item label="泊位总数" prop="park_num">
-                  <!-- <el-radio-group v-model="form.radio2">
-                    <el-radio :label="1">男</el-radio>
-                    <el-radio :label="2">女</el-radio>
-                  </el-radio-group> -->
-                  <el-input
-                    v-model="form.park_num"
-                    type="number"
-                    placeholder="泊位总数"
-                  ></el-input>
-                </el-form-item>
-              </el-col>
-              <el-col :span="12">
-                <el-form-item label="空闲泊位数量" prop="free_count">
-                  <!-- <el-radio-group v-model="form.radio2">
-                    <el-radio :label="1">男</el-radio>
-                    <el-radio :label="2">女</el-radio>
-                  </el-radio-group> -->
-                  <el-input
-                    v-model="form.free_count"
-                    type="number"
-                    placeholder="空闲泊位数量"
-                  ></el-input>
-                </el-form-item>
-              </el-col>
-              <el-col :span="12">
-                <el-form-item label="停车场等级" prop="park_grade">
-                  <el-select
-                    v-model="form.park_grade"
-                    placeholder="停车场等级"
-                    class="w"
-                  >
-                    <el-option
-                      v-for="(item, i) in result.park_grades"
-                      :key="i"
-                      :label="item.label"
-                      :value="item.dc_value"
-                    ></el-option>
-                  </el-select>
-                </el-form-item>
-              </el-col>
-              <el-col :span="12">
-                <el-form-item label="选择区域" prop="area_id">
-                  <el-select
-                    v-model="form.area_id"
-                    @change="getStreetList('b')"
-                    placeholder="所有区域"
-                    class="w"
-                  >
-                    <el-option
-                      v-for="(item, i) in result.area_list"
-                      :key="i"
-                      :label="item.area_name"
-                      :value="item.id"
-                    ></el-option>
-                  </el-select>
-                </el-form-item>
-              </el-col>
-              <el-col :span="12">
-                <el-form-item label="指定街道" prop="street_id">
-                  <el-select
-                    v-model="form.street_id"
-                    filterable
-                    size="small"
-                    placeholder="所有街道"
-                    class="w"
-                  >
-                    <el-option
-                      v-for="(item, i) in result.street_list"
-                      :key="i"
-                      :label="item.street_name"
-                      :value="item.id"
-                    ></el-option>
-                  </el-select>
-                </el-form-item>
-              </el-col>
-              <el-col :span="24">
-                <el-form-item label="厂商" prop="brand">
-                  <el-input
-                    v-model="form.brand"
-                    placeholder="厂商"
-                  ></el-input>
-                </el-form-item>
-              </el-col>
-              <el-col :span="24">
-                <el-form-item label="包月上限" prop="limit_monthly">
-                  <!-- <el-radio-group v-model="form.radio2">
-                    <el-radio :label="1">男</el-radio>
-                    <el-radio :label="2">女</el-radio>
-                  </el-radio-group> -->
-                  <el-input
-                    v-model="form.limit_monthly"
-                    type="number"
-                    placeholder="包月上限"
-                  ></el-input>
-                </el-form-item>
-              </el-col>
-              <el-col :span="24">
-                <el-form-item label="停车场地址" prop="address">
-                  <el-input
-                    v-model="form.address"
-                    placeholder="停车场地址"
-                  ></el-input>
-                </el-form-item>
-              </el-col>
-              <el-col :span="24">
-                <el-form-item label="坐标范围">
-                  <el-input
-                    v-model="form.coordinate"
-                    placeholder=""
-                    disabled
-                  ></el-input>
-                  <span class="color999 lh20"
-                    >提示：http://lbs.qq.com/tool/getpoint/index.html，以腾讯位置服务坐标拾取为准。</span
-                  >
-                </el-form-item>
-              </el-col>
-              <el-col :span="24">
-                <el-form-item label="停车场查询">
-                  <el-input v-model="form.searchkey"
-                    ><template v-slot:append
-                      ><el-button @click="searchMaps()"
-                        >查询</el-button
-                      ></template
-                    ></el-input
-                  >
-                </el-form-item>
-              </el-col>
-              <el-col :span="24">
-                <div class="map">
-                  <div id="has-map" class="has-map" />
-                </div>
-              </el-col>
-            </el-row>
-          </el-form>
-        </el-tab-pane>
-        <el-tab-pane label="收费方案" name="second">
-          <div class="mt10"></div>
-          <el-form
-            label-width="150px"
-            size="small"
-            :rules="charge"
-            :model="form"
-          >
-            <el-form-item label="选择收费方案(蓝牌)" prop="blue_charge_id">
-              <el-select
-                v-model="form.blue_charge_id"
-                filterable
-                size="small"
-                placeholder="所有收费方案"
-                class="w"
-              >
-                <el-option
-                  v-for="(item, i) in result.chargeProgramme_list"
-                  :key="i"
-                  :label="item.programme_name"
-                  :value="item.id"
-                ></el-option>
-              </el-select>
-            </el-form-item>
-            <el-form-item label="选择收费方案(绿牌)" prop="green_charge_id">
-              <el-select
-                v-model="form.green_charge_id"
-                filterable
-                size="small"
-                placeholder="所有收费方案"
-                class="w"
-              >
-                <el-option
-                  v-for="(item, i) in result.chargeProgramme_list"
-                  :key="i"
-                  :label="item.programme_name"
-                  :value="item.id"
-                ></el-option>
-              </el-select>
-            </el-form-item>
-
-            <el-form-item label="选择收费方案(黄牌)" prop="yellow_charge_id">
-              <el-select
-                v-model="form.yellow_charge_id"
-                filterable
-                size="small"
-                placeholder="所有收费方案"
-                class="w"
-              >
-                <el-option
-                  v-for="(item, i) in result.chargeProgramme_list"
-                  :key="i"
-                  :label="item.programme_name"
-                  :value="item.id"
-                ></el-option>
-              </el-select>
-            </el-form-item>
-          </el-form>
-        </el-tab-pane>
-      </el-tabs>
-      <template #footer>
-        <span class="dialog-footer">
-          <el-button @click="cancleEdit">取 消</el-button>
-          <el-button type="primary" @click="saveEdit">确 定</el-button>
-        </span>
-      </template>
-    </el-dialog>
     <!-- 停车场收费说明 -->
     <el-dialog title="停车场收费说明" v-model="ppVisible" width="560px">
       <el-form label-width="90px">
@@ -617,20 +376,18 @@
         </el-descriptions-item>
       </el-descriptions>
     </el-dialog>
+    <!-- 新增编辑弹窗 -->
+    <edit ref="edit"></edit>
   </div>
 </template>
 
 <script>
-import { ref, reactive, nextTick } from "vue";
+import { ref, reactive, nextTick,getCurrentInstance } from "vue";
 import { ElMessage, ElMessageBox } from "element-plus";
+import edit from './parkingList/edit.vue'
 import {
   parkList,
-  queryAreaData,
-  queryStreetData,
   delParkAll,
-  chargeProgrammeData,
-  dictData,
-  addPark,
   editPark,
   loginUser,
   exportParkingData,
@@ -639,21 +396,10 @@ import { useRouter } from "vue-router";
 
 export default {
   name: "parkinglist",
-  components: {},
+  components: {edit},
   data() {
     return {
       tableH: 0,
-      formRules: {
-        park_code: [{ required: true, message: "必填项", trigger: "blur" }],
-        park_name: [{ required: true, message: "必填项", trigger: "blur" }],
-        park_num: [{ required: true, message: "必填项", trigger: "blur" }],
-        park_grade: [{ required: true, message: "必填项", trigger: "blur" }],
-        area_id: [{ required: true, message: "必填项", trigger: "blur" }],
-        street_id: [{ required: true, message: "必填项", trigger: "blur" }],
-        address: [{ required: true, message: "必填项", trigger: "blur" }],
-        brand: [{ required: true, message: "必填项", trigger: "blur" }],
-        // coordinate: [{ required: true, message: "必填项", trigger: "blur" }],
-      },
       charge: {
         blue_charge_id: [
           { required: true, message: "必填项", trigger: "blur" },
@@ -668,6 +414,7 @@ export default {
     };
   },
   setup() {
+    const {proxy} = getCurrentInstance();
     const query = reactive({
       park_name: "",
       area_id: "",
@@ -710,66 +457,10 @@ export default {
 
     const getLoginUser = () => {
       loginUser().then((res) => {
-        // console.log(11);
-        // console.log(res.data);
         result.sysUser = res.data;
       });
     };
     getLoginUser();
-
-    // 区域
-    const getAreaData = () => {
-      queryAreaData(query).then((res) => {
-        // console.log(res);
-        result.area_list = res.data;
-        // console.log(res.data);
-      });
-    };
-    getAreaData();
-    // 获取街道
-    let queryStreet = reactive({
-      areaId: query.area_id,
-    });
-    const getStreetList = (type) => {
-      if (type == "a") {
-        queryStreet.areaId = query.area_id;
-        query.street_id = "";
-      } else if (type == "b") {
-        queryStreet.areaId = form.area_id;
-        form.street_id = "";
-      } else {
-        queryStreet.areaId = form.area_id;
-      }
-      queryStreetData(queryStreet).then((res) => {
-        // console.log(res);
-        if (type == "a") {
-          result.query_street_list = res.data;
-        } else {
-          result.street_list = res.data;
-        }
-        // console.log(res.data);
-      });
-    };
-
-    // 获取收费方案
-    const getChargeProgrammeData = () => {
-      chargeProgrammeData(query).then((res) => {
-        // console.log(res);
-        result.chargeProgramme_list = res.data;
-        // console.log(res.data);
-      });
-    };
-    // 查询区域等级
-    let dict = reactive({
-      is_del: "0",
-      dict_type: "parkGrade",
-    });
-    const getParkGrade = () => {
-      dictData(dict).then((res) => {
-        // console.log(res);
-        result.park_grades = res.data;
-      });
-    };
 
     const tableData = ref([]);
     const pageTotal = ref(0);
@@ -876,213 +567,9 @@ export default {
     const ppVisible = ref(false);
     const router = useRouter();
     let idx = "";
-    var timer = "";
 
-    const handleEdit = (index, row, type) => {
-      result.street_list = [];
-      getAreaData();
-      //initMap();
-      getChargeProgrammeData();
-      getParkGrade();
-      if (type) {
-        result.dialogT = "新增";
-        idx = "";
-        form.park_code = "";
-        form.park_name = "";
-        form.park_num = "";
-        form.park_grade = "";
-        form.area_id = "";
-        form.street_id = "";
-        form.address = "";
-        form.brand = "";
-        form.longitude = "";
-        form.coordinate = "";
-        form.latitude = "";
-        form.id = "";
-        form.blue_charge_id = "";
-        form.green_charge_id = "";
-        form.yellow_charge_id = "";
-        form.free_count = "";
-        form.traffic_park_code = "";
-      } else {
-        result.dialogT = "编辑";
-        idx = row.id;
-        Object.keys(form).forEach((item) => {
-          form[item] = row[item];
-        });
-        form.coordinate = form.latitude + "," + form.longitude;
-        getStreetList("c");
-        // console.log(111);
-        // console.log(form);
-      }
-      timer = setTimeout(function () {
-        initMaps();
-      }, 500);
-      editVisible.value = true;
-    };
-
-    var map;
-    const cancleEdit = () => {
-      map.destroy();
-      editVisible.value = false;
-    };
-    const initMaps = () => {
-      if (document.getElementById("has-map")) {
-        var point = [34.24277, 117.184547];
-        if (form.coordinate != "" && form.coordinate != null) {
-          point[0] = form.coordinate.split(",")[0];
-          point[1] = form.coordinate.split(",")[1];
-        }
-        //console.log(point);
-        const center = new window.TMap.LatLng(point[0], point[1]);
-        // 初始化地图
-        map = new window.TMap.Map(document.getElementById("has-map"), {
-          rotation: 0, // 设置地图旋转角度
-          pitch: 0, // 设置俯仰角度（0~45）
-          zoom: 16, // 设置地图缩放级别
-          center: center, // 设置地图中心点坐标
-        });
-        var geocoder = new window.TMap.service.Geocoder(); // 新建一个正逆地址解析类
-        geocoder
-          .getAddress({ location: center }) // 将给定的坐标位置转换为地址
-          .then((result) => {
-            form.searchkey = result.result.address;
-            // 显示查询到的地址
-          });
-        var markers = new window.TMap.MultiMarker({
-          map: map,
-          geometries: [
-            {
-              id: "main",
-              position: center, // 将得到的坐标位置用点标记标注在地图上
-            },
-          ],
-        });
-        // 创建信息窗口
-        const info = new window.TMap.InfoWindow({
-          map,
-          position: map.getCenter(),
-          offset: { x: 0, y: -52 },
-        });
-        info.close();
-
-        //点击地图事件
-        map.on("click", (evt) => {
-          //console.log(evt)
-          info.open();
-          info.setPosition(evt.latLng);
-          var lat = evt.latLng.getLat().toFixed(6);
-          var lng = evt.latLng.getLng().toFixed(6);
-          info.setContent("当前坐标：" + lat + "," + lng);
-          form.coordinate = lat + "," + lng;
-          markers.setGeometries([]); // 将给定的地址转换为坐标位置
-          markers.updateGeometries([
-            {
-              id: "main",
-              position: evt.latLng, // 将得到的坐标位置用点标记标注在地图上
-            },
-          ]);
-          geocoder
-            .getAddress({ location: evt.latLng }) // 将给定的坐标位置转换为地址
-            .then((result) => {
-              form.searchkey = result.result.address;
-              // 显示查询到的地址
-            });
-          //map.setCenter(evt.latLng);
-        });
-
-        // map.destroy();   //销毁地图
-        clearInterval(timer);
-        // }, 500);
-      }
-    };
-    const searchMaps = () => {
-      if (form.searchkey == "" || form.searchkey == null) {
-        ElMessage.warning("查询地址不能为空");
-      } else {
-        if (form.searchkey.indexOf("徐州") == -1) {
-          form.searchkey = "徐州" + form.searchkey;
-        }
-
-        document.getElementById("has-map").innerHTML = "";
-        var point = [34.24277, 117.184547];
-        if (form.coordinate != "" && form.coordinate != null) {
-          point[0] = form.coordinate.split(",")[0];
-          point[1] = form.coordinate.split(",")[1];
-        }
-        //console.log(point);
-        const center = new window.TMap.LatLng(point[0], point[1]);
-        // 初始化地图
-        map = new window.TMap.Map(document.getElementById("has-map"), {
-          rotation: 0, // 设置地图旋转角度
-          pitch: 0, // 设置俯仰角度（0~45）
-          zoom: 16, // 设置地图缩放级别
-          center: center, // 设置地图中心点坐标
-        });
-
-        var geocoder = new window.TMap.service.Geocoder(); // 新建一个正逆地址解析类
-        var markers = new window.TMap.MultiMarker({
-          map: map,
-          geometries: [
-            {
-              id: "main",
-              position: center, // 将得到的坐标位置用点标记标注在地图上
-            },
-          ],
-        });
-        // 创建信息窗口
-        const info = new window.TMap.InfoWindow({
-          map,
-          position: map.getCenter(),
-          offset: { x: 0, y: -52 },
-        });
-        info.close();
-        markers.setGeometries([]); // 将给定的地址转换为坐标位置
-        geocoder.getLocation({ address: form.searchkey }).then((result) => {
-          markers.updateGeometries([
-            {
-              id: "main",
-              position: result.result.location, // 将得到的坐标位置用点标记标注在地图上
-            },
-          ]);
-          info.open();
-          info.setPosition(result.result.location);
-          var lat = result.result.location.getLat().toFixed(6);
-          var lng = result.result.location.getLng().toFixed(6);
-          info.setContent("当前坐标：" + lat + "," + lng);
-          map.setCenter(result.result.location);
-          form.coordinate = result.result.location.toString();
-          // 显示坐标数值
-          //console.log(form.coordinate);
-        });
-
-        //点击地图事件
-        map.on("click", (evt) => {
-          //console.log(evt)
-          info.open();
-          info.setPosition(evt.latLng);
-          var lat = evt.latLng.getLat().toFixed(6);
-          var lng = evt.latLng.getLng().toFixed(6);
-          info.setContent("当前坐标：" + lat + "," + lng);
-          form.coordinate = lat + "," + lng;
-          markers.setGeometries([]); // 将给定的地址转换为坐标位置
-          markers.updateGeometries([
-            {
-              id: "main",
-              position: evt.latLng, // 将得到的坐标位置用点标记标注在地图上
-            },
-          ]);
-          geocoder
-            .getAddress({ location: evt.latLng }) // 将给定的坐标位置转换为地址
-            .then((result) => {
-              form.searchkey = result.result.address;
-              // 显示查询到的地址
-            });
-          //map.setCenter(evt.latLng);
-        });
-      }
-
-      //map.destroy();
+    const handleEdit = (row) => {
+      proxy.$refs.edit.open(row);
     };
 
     // 收费说明
@@ -1103,68 +590,6 @@ export default {
         },
       });
     };
-
-    const saveEdit = () => {
-      // 不可为空
-      if (
-        form.park_code == null ||
-        form.park_code == "" ||
-        form.park_name == null ||
-        form.park_name == "" ||
-        form.park_num == null ||
-        form.park_num == "" ||
-        form.park_grade == null ||
-        form.park_grade == "" ||
-        form.area_id == null ||
-        form.area_id == "" ||
-        form.street_id == null ||
-        form.street_id == "" ||
-        form.address == null ||
-        form.address == "" ||
-        form.brand == null ||
-        form.brand == "" ||
-        form.coordinate == null ||
-        form.coordinate == "" ||
-        form.blue_charge_id == null ||
-        form.blue_charge_id == "" ||
-        form.green_charge_id == null ||
-        form.green_charge_id == "" ||
-        form.yellow_charge_id == null ||
-        form.yellow_charge_id == ""
-      ) {
-        ElMessage.error("参数不可为空！");
-        return false;
-      }
-
-      form.longitude = form.coordinate.split(",")[1];
-      form.latitude = form.coordinate.split(",")[0];
-
-      if (!idx) {
-        addPark(form)
-          .then((res) => {
-            // console.log(res.data);
-            ElMessage.success(res.msg);
-          })
-          .then(() => {
-            query.pageIndex = 1;
-            getData();
-          });
-      } else {
-        console.log("修改");
-        form.id = idx;
-        editPark(form)
-          .then((res) => {
-            // console.log(res);
-            ElMessage.success(res.msg);
-          })
-          .then(() => {
-            getData();
-          });
-      }
-
-      editVisible.value = false;
-    };
-
     const saveRemark = () => {
       ppVisible.value = false;
 
@@ -1181,30 +606,20 @@ export default {
 
     return {
       query,
-      timer,
       result,
       tableData,
       pageTotal,
-      editVisible,
       viewVisible,
-      form,
-      map,
-      cancleEdit,
-      searchMaps,
       handleRemark,
       saveRemark,
       handleStop,
       handleSearch,
-      getStreetList,
-      queryStreet,
       handlePageChange,
       handleDelete,
-        handleOnOff,
+      handleOnOff,
       handleEdit,
       handleView,
-      activeName: "first",
       getData,
-      saveEdit,
       multipleSelection: [],
       dialogImageUrl: "",
       ppVisible,

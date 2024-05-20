@@ -5,18 +5,19 @@ import cn.hutool.json.JSONObject;
 import cn.hutool.poi.excel.ExcelUtil;
 import cn.hutool.poi.excel.ExcelWriter;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jsdc.core.base.BaseService;
 import com.jsdc.zhtc.common.constants.Constants;
+import com.jsdc.zhtc.common.constants.GlobalData;
 import com.jsdc.zhtc.common.utils.StringUtils;
 import com.jsdc.zhtc.dao.ParkDao;
 import com.jsdc.zhtc.mapper.ParkMapper;
 import com.jsdc.zhtc.model.Park;
 import com.jsdc.zhtc.model.SysUser;
 import com.jsdc.zhtc.utils.SecureUtil;
-import com.jsdc.zhtc.vo.CommonVo;
-import com.jsdc.zhtc.vo.ParkVo;
+import com.jsdc.zhtc.vo.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,10 +27,7 @@ import javax.transaction.Transactional;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URLEncoder;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * ClassName: ParkService <br/>
@@ -48,6 +46,9 @@ public class ParkService extends BaseService<ParkDao, Park> {
 
     @Autowired
     private SysUserService sysUserService;
+
+    @Autowired
+    private CacheDataService cacheDataService;
 
 
     /**
@@ -135,11 +136,8 @@ public class ParkService extends BaseService<ParkDao, Park> {
         });
         writer.addHeaderAlias("park_code", "停车场编码");
         writer.addHeaderAlias("park_name", "名称");
-        writer.addHeaderAlias("area_name", "区域");
-        writer.addHeaderAlias("street_name", "街道");
         writer.addHeaderAlias("status", "状态");
         writer.addHeaderAlias("park_num", "总泊位");
-        writer.addHeaderAlias("longitude", "坐标");
         writer.addHeaderAlias("create_time", "时间");
         writer.setOnlyAlias(true);
         writer.write(list, true);
@@ -203,5 +201,136 @@ public class ParkService extends BaseService<ParkDao, Park> {
     }
 
 
+    /**
+     * 上传车辆入场记录
+     * @author wzn
+     * @date 2024/5/17 15:17
+     */
+    public String  uploadCarInData (UploadCarInDataVo uploadCarInDataVo) {
+        JSONObject paramJson = new JSONObject();
+        paramJson.put("uid", uploadCarInDataVo.getUid());	// 流水号，一次停车的进场、离场、缴费信息等要保证uid相同
+        paramJson.put("arriveID",uploadCarInDataVo.getArriveID());	// 入场记录id
+        paramJson.put("plateNo", uploadCarInDataVo.getPlateNo());	// 车牌号
+        paramJson.put("plateColor", uploadCarInDataVo.getPlateColor());	// 车牌颜色，1：蓝色；2：黄色；3：白色；4：黑色；5：绿色
+        paramJson.put("carType",uploadCarInDataVo.getCarType());	// 车型，1：小型车；2：中型车；3：大型车
+        paramJson.put("parkingCode", uploadCarInDataVo.getParkingCode());	// 停车场编号
+        paramJson.put("entryNum",uploadCarInDataVo.getEntryNum());	// 入口编号
+        paramJson.put("totalBerthNum", uploadCarInDataVo.getTotalBerthNum());	// 泊位总数
+        paramJson.put("openBerthNum", uploadCarInDataVo.getOpenBerthNum());	// 开放泊位数
+        paramJson.put("freeBerthNum", uploadCarInDataVo.getFreeBerthNum());	// 剩余开放泊位数
+        paramJson.put("arriveTime", uploadCarInDataVo.getArriveTime());	// 入场时间（格式：yyyy-MM-dd HH:mm:ss）
+        paramJson.put("parkingType", uploadCarInDataVo.getParkingType());	// 停车类型，1：临时停车；2：包月停车；3：共享停车；4：特殊停车
+        paramJson.put("uploadTime", DateUtil.format(new Date(),"yyyy-MM-dd HH:mm:ss"));	// 上传时间（格式：yyyy-MM-dd HH:mm:ss ）
+
+        JSONObject requestJson = new JSONObject();
+        requestJson.put("data", paramJson.toString());
+
+        Map<String, String> paramMap = new HashMap<>() ;
+        paramMap.put("accessID", Constants.ACCESSID);
+        String cipher = SecureUtil.rsaEncryptPublicKey(requestJson.toString(), Constants.SERVERPUBLICKEY);
+        paramMap.put("cipher", cipher);
+        String sign = SecureUtil.sign(cipher, Constants.PRIVATEKEY);
+        paramMap.put("sign", sign);
+
+        String result = SecureUtil.doPost(Constants.URL + "/uploadCarInData", paramMap);
+        log.info("result：" + result);
+        return result ;
+    }
+
+
+
+    /**
+     *上传车辆离场记录
+     * @author wzn
+     * @date 2024/5/17 15:26
+     */
+    public String  uploadCarOutData (UploadCarOutDataVo uploadCarOutDataVo) {
+        JSONObject paramJson = new JSONObject();
+        paramJson.put("uid", uploadCarOutDataVo.getUid());	// 流水号，一次停车的进场、离场、缴费信息等要保证uid相同
+        paramJson.put("endID",uploadCarOutDataVo.getEndID());	// 场库系统给出的车辆离场记录i d
+        paramJson.put("plateNo", uploadCarOutDataVo.getPlateNo());	// 车牌号
+        paramJson.put("carType",uploadCarOutDataVo.getCarType());	// 车型，1：小型车；2：中型车；3：大型车
+        paramJson.put("parkingCode", uploadCarOutDataVo.getParkingCode());	// 停车场编号
+        paramJson.put("totalBerthNum", uploadCarOutDataVo.getTotalBerthNum());	// 泊位总数
+        paramJson.put("openBerthNum", uploadCarOutDataVo.getOpenBerthNum());	// 开放泊位数
+        paramJson.put("freeBerthNum", uploadCarOutDataVo.getFreeBerthNum());	// 剩余开放泊位数
+        paramJson.put("arriveTime", uploadCarOutDataVo.getArriveTime());	// 入场时间（格式：yyyy-MM-dd HH:mm:ss）
+        paramJson.put("parkingType", uploadCarOutDataVo.getParkingType());	// 停车类型，1：临时停车；2：包月停车；3：共享停车；4：特殊停车
+        paramJson.put("endTime", uploadCarOutDataVo.getEndTime());	// 离场时间（格式：yyyy- MM- ddHH: mm: ss ）
+        paramJson.put("entryNum", uploadCarOutDataVo.getEntryNum());	// 入口编号
+        paramJson.put("outNum", uploadCarOutDataVo.getOutNum());	// 出口编号
+        paramJson.put("plateColor", uploadCarOutDataVo.getPlateColor());	// 车牌颜色，1：蓝色；2：黄色；3：白色；4：黑色；5：绿色
+        paramJson.put("uploadTime", DateUtil.format(new Date(),"yyyy-MM-dd HH:mm:ss"));	// 上传时间（格式：yyyy-MM-dd HH:mm:ss ）
+        paramJson.put("chargeFee",uploadCarOutDataVo.getChargeFee());	// 计费金额（单位：分) ，最大不超过1000000000 ，参见名词解释
+        paramJson.put("shouldPay",uploadCarOutDataVo.getShouldPay());	// 应收金额（单位：分) ，最大不超过1000000000 ，参见名词解释
+
+        JSONObject requestJson = new JSONObject();
+        requestJson.put("data", paramJson.toString());
+
+        Map<String, String> paramMap = new HashMap<>() ;
+        paramMap.put("accessID", Constants.ACCESSID);
+        String cipher = SecureUtil.rsaEncryptPublicKey(requestJson.toString(), Constants.SERVERPUBLICKEY);
+        paramMap.put("cipher", cipher);
+        String sign = SecureUtil.sign(cipher, Constants.PRIVATEKEY);
+        paramMap.put("sign", sign);
+
+        String result = SecureUtil.doPost(Constants.URL + "/uploadCarOutData", paramMap);
+        log.info("result：" + result);
+        return result ;
+    }
+
+
+    /**
+     * 上传照片  （仅支持J PG 格式的图片文件）
+     * @author wzn
+     * @date 2024/5/17 15:31
+     */
+    public String  uploadPhoto (UploadPhotoVo uploadPhotoVo) {
+        JSONObject paramJson = new JSONObject();
+        paramJson.put("uid", uploadPhotoVo.getUid());	// 流水号，一次停车的进场、离场、缴费信息等要保证uid相同
+        paramJson.put("parkingCode", uploadPhotoVo.getParkingCode());	// 停车场编号
+        paramJson.put("photoID", uploadPhotoVo.getPhotoID());	// 场库系统给出的照片编号
+        paramJson.put("time", uploadPhotoVo.getTime());	// 照片生成时间（格式：yyyy- MM- ddHH: mm: ss ）
+        paramJson.put("type", uploadPhotoVo.getType());	// 入场或离场的照片，参见数据字典
+        paramJson.put("name", uploadPhotoVo.getName());	//照片名称
+        paramJson.put("uploadTime", DateUtil.format(new Date(),"yyyy-MM-dd HH:mm:ss"));	// 上传时间（格式：yyyy-MM-dd HH:mm:ss ）
+
+        JSONObject requestJson = new JSONObject();
+        requestJson.put("data", paramJson.toString());
+
+        Map<String, String> paramMap = new HashMap<>() ;
+        paramMap.put("accessID", Constants.ACCESSID);
+        String cipher = SecureUtil.rsaEncryptPublicKey(requestJson.toString(), Constants.SERVERPUBLICKEY);
+        paramMap.put("cipher", cipher);
+        String sign = SecureUtil.sign(cipher, Constants.PRIVATEKEY);
+        paramMap.put("sign", sign);
+
+        paramMap.put("file", "");// Base64 编码字符串（注： 不可空1 9大小不超过512 K）；不参与加密签名，单独key-val ue 传输
+        String result = SecureUtil.doPost(Constants.URL + "/uploadPhoto", paramMap);
+        log.info("result：" + result);
+        return result ;
+    }
+
+
+    public ResultInfo delAll(String parkIds) {
+
+        List<String> parkList = Arrays.asList(parkIds.split(","));
+        UpdateWrapper<Park> wrapper = new UpdateWrapper<>();
+        wrapper.lambda().set(Park::getIs_del, GlobalData.ISDEL_YES)
+                .in(Park::getId, parkList);
+        if(update(null, wrapper) > 0){
+
+            parkList.forEach(x->{
+                Park park=selectById(x);
+                cacheDataService.updateLocationCache(park);
+                cacheDataService.updChargeByRoad_ParkId(park.getId());
+
+            });
+            return ResultInfo.success("删除停车场成功！");
+        }else{
+            return ResultInfo.error("删除停车场失败！");
+        }
+
+    }
 
 }

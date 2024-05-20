@@ -2,31 +2,23 @@ package com.jsdc.zhtc.controller;
 
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.IoUtil;
-import cn.hutool.poi.excel.ExcelReader;
 import cn.hutool.poi.excel.ExcelUtil;
 import cn.hutool.poi.excel.ExcelWriter;
 import com.jsdc.jpush.api.excelderive.ExcelDeriveModel;
 import com.jsdc.zhtc.common.utils.StringUtils;
 import com.jsdc.zhtc.mapper.PaymentOrderMapper;
-import com.jsdc.zhtc.service.CarnoCompanyService;
 import com.jsdc.zhtc.service.SysUserService;
-import com.jsdc.zhtc.vo.BatchCarno;
 import com.jsdc.zhtc.vo.PaymentOrderVo;
-import com.jsdc.zhtc.vo.ResultInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URLEncoder;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -43,8 +35,6 @@ public class ExcelController {
     SysUserService sysUserService;
     @Autowired
     PaymentOrderMapper paymentOrderMapper;
-    @Autowired
-    private CarnoCompanyService service;
 
     /**
      * 支付订单导出
@@ -53,13 +43,6 @@ public class ExcelController {
      * @throws IOException
      */
     @RequestMapping("/exportPaymentOrder")
-    // paymentNoOrSerialNo: "",
-    //     areaId: "",
-    //     streetId: "",
-    //     roadId: "",
-    //     paymentType: "",
-    //     startTime: "",
-    //     endTime: "",
     public void exportPaymentOrder(HttpServletResponse response, String parkingType,
                                    @RequestParam(value = "paymentNoOrSerialNo", required = false) String paymentNoOrSerialNo,
                                    @RequestParam(value = "areaId", required = false) String areaId,
@@ -159,72 +142,6 @@ public class ExcelController {
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }
-    }
-
-    /**
-     * 车牌管理模板导入
-     *
-     * @throws IOException
-     */
-    @RequestMapping("/importOperateCarno")
-    @ResponseBody
-    public ResultInfo importOperateCarno(MultipartFile file, Integer companyId) throws IOException {
-        //fileName 文件名
-        String fileName = file.getOriginalFilename();
-        boolean xlsx = fileName.endsWith(".xlsx");
-        if (!xlsx) {
-            return ResultInfo.error("请上传以.xlsx结尾的文件");
-        }
-        BatchCarno batchCarno = new BatchCarno();
-        batchCarno.setCompanyId(companyId);
-        List<String> blueCars = new ArrayList<>();
-        List<String> yellowCars = new ArrayList<>();
-        List<String> greenCars = new ArrayList<>();
-        //得到文件流
-        InputStream inputStream = file.getResource().getInputStream();
-        ExcelReader reader = ExcelUtil.getReader(inputStream);
-        List<Map<String, Object>> readAll = reader.readAll();
-        if (readAll.size() == 0) {
-            return ResultInfo.error("空白模板，请填写内容！");
-        }
-        for (int i = 0; i < readAll.size(); i++) {
-            Map<String, Object> quMap = readAll.get(i);
-            //获取表格中的数据
-            String type = String.valueOf(quMap.get("车牌类型"));
-            if (StringUtils.isNotEmpty(type)) {
-                if (!type.equals("蓝牌") && type.equals("黄牌") && type.equals("绿牌")) {
-                    return ResultInfo.error("请选择正确选择车牌,第" + (i + 1) + "行");
-                }
-                String no = String.valueOf(quMap.get("车牌号"));
-                String name = String.valueOf(quMap.get("姓名"));
-                String phone = String.valueOf(quMap.get("电话"));
-                if (StringUtils.isEmpty(no)) {
-                    return ResultInfo.error("请输入车牌号,第" + (i + 1) + "行");
-                }
-                if (StringUtils.isEmpty(name)) {
-                    return ResultInfo.error("请输入名字,第" + (i + 1) + "行");
-                }
-                if (StringUtils.isEmpty(phone)) {
-                    return ResultInfo.error("请输入手机号,第" + (i + 1) + "行");
-                }
-                if (type.equals("蓝牌")) {
-                    blueCars.add(no + "-" + name + "-" + phone);
-                }
-                if (type.equals("黄牌")) {
-                    yellowCars.add(no + "-" + name + "-" + phone);
-                }
-                if (type.equals("绿牌")) {
-                    greenCars.add(no + "-" + name + "-" + phone);
-                }
-            } else {
-                return ResultInfo.error("请选择车牌类型,第" + i + "行");
-            }
-
-        }
-        batchCarno.setBlueCars(blueCars);
-        batchCarno.setYellowCars(yellowCars);
-        batchCarno.setGreenCars(greenCars);
-        return service.batchBindCars(batchCarno);
     }
 
 }

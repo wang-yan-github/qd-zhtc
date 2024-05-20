@@ -33,8 +33,6 @@ public class OperateAppealController extends BaseController {
     private SysUserService sysUserService;
     @Autowired
     private AppealNoticeFeedbackService noticeFeedbackService;
-    @Autowired
-    private InspectManageService inspectManageService;
 
 
     @Autowired

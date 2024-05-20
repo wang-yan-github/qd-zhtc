@@ -125,6 +125,9 @@ public class GateCtrl {
         }
     }
 
+    /**
+     * 播报语音
+     */
     @SneakyThrows
     public void voice(String topic, String clientId, String content) {
         String voiceCmd = initVoice(content);

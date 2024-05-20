@@ -1,0 +1,125 @@
+{
+    "list": [{
+            "id": 1,
+            "name": "张三",
+            "purviews": ["平台概览","路段实时监控","地图路段","实时停车"],
+            "addtimes": "2021-12-20 10:00:00",
+            "thumb":"http://www.jsdingchi.com/pictures/newsimages/QOS132300957324468162.png",
+            "state": "启用"
+
+        },
+        {
+            "id": 2,
+            "name": "李四",
+            "purviews": ["平台概览","路段实时监控","地图路段","实时停车"],
+            "thumb":"http://www.jsdingchi.com/pictures/newsimages/QOS132300957324468162.png",
+            "addtimes": "2021-12-20 10:00:00",
+            "state": "启用"
+            
+
+        },
+        {
+            "id": 3,
+            "name": "王五",
+            "purviews": ["平台概览","路段实时监控","地图路段","实时停车"],
+            "thumb":"http://www.jsdingchi.com/pictures/newsimages/QOS132300957324468162.png",
+            "addtimes": "2021-12-20 10:00:00",
+            "state": "禁用"
+
+        },
+        {
+            "id": 4,
+            "name": "赵六",
+            "purviews": ["平台概览","路段实时监控","地图路段","实时停车"],
+            "thumb":"http://www.jsdingchi.com/pictures/newsimages/QOS132300957324468162.png",
+            "addtimes": "2021-12-20 10:00:00",
+            "state": "启用"
+
+        },
+        {
+            "id": 5,
+            "name": "李四",
+            "purviews": ["平台概览","路段实时监控","地图路段","实时停车"],
+            "thumb":"http://www.jsdingchi.com/pictures/newsimages/QOS132300957324468162.png",
+            "addtimes": "2021-12-20 10:00:00",
+            "state": "启用"
+            
+
+        },
+        {
+            "id": 6,
+            "name": "王五",
+            "purviews": ["平台概览","路段实时监控","地图路段","实时停车"],
+            "addtimes": "2021-12-20 10:00:00",
+            "thumb":"http://www.jsdingchi.com/pictures/newsimages/QOS132300957324468162.png",
+            "state": "禁用"
+
+        },
+        {
+            "id": 7,
+            "name": "赵六",
+            "purviews": ["平台概览","路段实时监控","地图路段","实时停车"],
+            "addtimes": "2021-12-20 10:00:00",
+            "thumb":"http://www.jsdingchi.com/pictures/newsimages/QOS132300957324468162.png",
+            "state": "启用"
+
+        },
+        {
+            "id": 8,
+            "name": "李四",
+            "purviews": ["平台概览","路段实时监控","地图路段","实时停车"],
+            "addtimes": "2021-12-20 10:00:00",
+            "thumb":"http://www.jsdingchi.com/pictures/newsimages/QOS132300957324468162.png",
+            "state": "启用"
+            
+
+        },
+        {
+            "id": 9,
+            "name": "王五",
+            "purviews": ["平台概览","路段实时监控","地图路段","实时停车"],
+            "addtimes": "2021-12-20 10:00:00",
+            "thumb":"http://www.jsdingchi.com/pictures/newsimages/QOS132300957324468162.png",
+            "state": "禁用"
+
+        },
+        {
+            "id": 10,
+            "name": "赵六",
+            "purviews": ["平台概览","路段实时监控","地图路段","实时停车"],
+            "addtimes": "2021-12-20 10:00:00",
+            "thumb":"http://www.jsdingchi.com/pictures/newsimages/QOS132300957324468162.png",
+            "state": "启用"
+
+        },
+        {
+            "id": 11,
+            "name": "李四",
+            "purviews": ["平台概览","路段实时监控","地图路段","实时停车"],
+            "addtimes": "2021-12-20 10:00:00",
+            "thumb":"http://www.jsdingchi.com/pictures/newsimages/QOS132300957324468162.png",
+            "state": "启用"
+            
+
+        },
+        {
+            "id": 12,
+            "name": "王五",
+            "purviews": ["平台概览","路段实时监控","地图路段","实时停车"],
+            "addtimes": "2021-12-20 10:00:00",
+            "thumb":"http://www.jsdingchi.com/pictures/newsimages/QOS132300957324468162.png",
+            "state": "禁用"
+
+        },
+        {
+            "id": 13,
+            "name": "赵六",
+            "purviews": ["平台概览","路段实时监控","地图路段","实时停车"],
+            "addtimes": "2021-12-20 10:00:00",
+            "thumb":"http://www.jsdingchi.com/pictures/newsimages/QOS132300957324468162.png",
+            "state": "启用"
+
+        }
+    ],
+    "pageTotal": 13
+}

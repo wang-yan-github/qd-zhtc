@@ -7,11 +7,8 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * @ClassName BatchAddWhiteCarno
- * @Description TODO
- * @Author xuaolong
- * @Date 2022/2/21 09:55
- * @Version 1.0
+ * 车牌管理
+ * 批量录入车牌
  */
 @Data
 public class BatchAddWhiteCarno {
@@ -29,9 +26,7 @@ public class BatchAddWhiteCarno {
     List<String> greenCars;
 
     /**
-     * 白名单类型
-     * 0:内部车
-     * 1:企业(免税)车
+     * 车辆类型(1 固定车辆-非家属院居住 2 固定车辆-家属院居住 3 月租车辆 4 业务往来车辆 5 临时车辆)
      */
     Integer whitelist_type;
 
@@ -40,30 +35,8 @@ public class BatchAddWhiteCarno {
      */
     String reason;
 
-    /**
-     * 姓名
-     */
-    String name;
-
-    /**
-     * 电话
-     */
-    String phone;
-
-    /**
-     * 公司名称
-     */
-    String company_name;
-
-
-    /**
-     * 免费截止时间
-     */
-    Date cut_off_date;
-
-    List<Integer> parkIds;
-
-    List<Integer> roadIds;
+    //车主id
+    private Integer car_owner_id;
 
     // 白名单免费类型 1永久 2期限
     private String white_time_type;

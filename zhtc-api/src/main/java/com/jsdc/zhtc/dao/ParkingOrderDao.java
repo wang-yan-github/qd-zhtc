@@ -175,12 +175,12 @@ public class ParkingOrderDao extends BaseDao<ParkingOrder> {
             if (notEmpty(bean.getPark_id())) {
                 sql += " and r.park_id = '" + bean.getPark_id() + "'";
             }
-            if (notEmpty(bean.getIs_verification())) {
-                sql += " and r.is_verification = '" + bean.getIs_verification() + "'";
-            }
-            if (notEmpty(bean.getInspect_id())) {
-                sql += " and po.inspect_id = '" + bean.getInspect_id() + "'";
-            }
+//            if (notEmpty(bean.getIs_verification())) {
+//                sql += " and r.is_verification = '" + bean.getIs_verification() + "'";
+//            }
+//            if (notEmpty(bean.getInspect_id())) {
+//                sql += " and po.inspect_id = '" + bean.getInspect_id() + "'";
+//            }
             if (notEmpty(bean.getPay_type())) {
                 sql += " and r.pay_type = '" + bean.getPay_type() + "'";
                 sql += " and po.payment_type = '" + bean.getPay_type() + "'";
@@ -214,12 +214,12 @@ public class ParkingOrderDao extends BaseDao<ParkingOrder> {
                 " and po.is_del = 0 " +
                 " and po.status = '2' ";
         if (notEmpty(bean)) {
-            if (notEmpty(bean.getIs_verification())) {
-                sql += " and r.is_verification = '" + bean.getIs_verification() + "'";
-            }
-            if (notEmpty(bean.getInspect_id())) {
-                sql += " and po.inspect_id = '" + bean.getInspect_id() + "'";
-            }
+//            if (notEmpty(bean.getIs_verification())) {
+//                sql += " and r.is_verification = '" + bean.getIs_verification() + "'";
+//            }
+//            if (notEmpty(bean.getInspect_id())) {
+//                sql += " and po.inspect_id = '" + bean.getInspect_id() + "'";
+//            }
             if (notEmpty(bean.getPay_type())) {
                 sql += " and r.pay_type = '" + bean.getPay_type() + "'";
                 sql += " and po.payment_type = '" + bean.getPay_type() + "'";
@@ -243,9 +243,9 @@ public class ParkingOrderDao extends BaseDao<ParkingOrder> {
         String sql = "update parking_order set is_verification = '1' " +
                 " where is_del = 0 ";
         if (notEmpty(bean)) {
-            if (notEmpty(bean.getIs_verification())) {
-                sql += " and is_verification = '" + bean.getIs_verification() + "'";
-            }
+//            if (notEmpty(bean.getIs_verification())) {
+//                sql += " and is_verification = '" + bean.getIs_verification() + "'";
+//            }
             if (notEmpty(bean.getPay_type())) {
                 sql += " and pay_type = '" + bean.getPay_type() + "'";
             }
@@ -261,9 +261,9 @@ public class ParkingOrderDao extends BaseDao<ParkingOrder> {
                 " where po.is_del = 0 " +
                 " and po.status = '2' ";
         if (notEmpty(bean)) {
-            if (notEmpty(bean.getInspect_id())) {
-                sql += " and po.inspect_id = '" + bean.getInspect_id() + "'";
-            }
+//            if (notEmpty(bean.getInspect_id())) {
+//                sql += " and po.inspect_id = '" + bean.getInspect_id() + "'";
+//            }
             if (notEmpty(bean.getPay_type())) {
                 sql += " and po.payment_type = '" + bean.getPay_type() + "'";
             }

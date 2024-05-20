@@ -1,6 +1,7 @@
 package com.jsdc.zhtc.model;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
@@ -10,19 +11,14 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
+
 
 /**
- * ClassName: park <br/>
- * Description: 停车场<br/>
- * date: 2021/12/30 9:48<br/>
- *
- * @author bn<br       />
+ * 停车场管理
  */
 @Entity
 @TableName("park")
@@ -49,7 +45,7 @@ public class Park extends Model<Park> implements Serializable {
     //停车场名称
     private String park_name;
 
-    //百胜ukey
+        //百胜ukey
     private String ukey;
 
     // 泊位总数
@@ -70,7 +66,7 @@ public class Park extends Model<Park> implements Serializable {
     //充电桩车位数
     private Integer chargeTotalNum;
 
-    //停车场类型 1.急诊区域
+    //停车场类型 1.急诊 2地下 3普通停车场
     private String park_grade;
 
     // 城市
@@ -174,11 +170,42 @@ public class Park extends Model<Park> implements Serializable {
             this.latitude = latitude;
     }
 
-    //急诊区域 时长类型 1日 2月 3年
+    //急诊区域 时长类型 1日 2周 3月 4季度 5年
     private Integer timeType ;
 
     //急诊区域 累计停车时长
     private Integer cumulativeDuration ;
 
+    //自动重置时间
+    private String resetTime ;
+
+    //白名单开关 0关 1开
+    private Integer whitelistSwitch ;
+
+    //限时停放开关  0关 1开
+    private String timeLimitSwitch ;
+
+    //白名单传参
+    @Transient
+    @TableField(exist = false)
+    private List<String> whiteList ;
+
+    @Transient
+    @TableField(exist = false)
+    private  List<OperateCarno>  operateCarnoList ;
+
+    //限时传参
+    @Transient
+    @TableField(exist = false)
+    private List<String> timeLimitList ;
+
+
+    @Transient
+    @TableField(exist = false)
+    private List<SysDict> sysDictList ;
+
+    @Transient
+    @TableField(exist = false)
+    private String park_grades ;
 
 }

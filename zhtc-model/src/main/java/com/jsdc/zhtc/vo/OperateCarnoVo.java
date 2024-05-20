@@ -1,58 +1,33 @@
 package com.jsdc.zhtc.vo;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.jsdc.zhtc.model.OperateCarno;
 import lombok.Data;
 
-import java.util.Date;
-import java.util.List;
-
 /**
- * ClassName: OperateCarnoVo <br/>
- * Description: <br/>
- * date: 2022/1/4 14:37<br/>
+ * 车牌管理
  *
- * @author bn<br   />
+ * @author thr
  */
 @Data
 public class OperateCarnoVo extends OperateCarno {
-
-    private Integer id;
-
-    // 手机号
-    private String phone2;
-    private String bindName;
-
+    //车牌类型名称 (1蓝牌、2绿牌、3黄牌)
     private String carTypeName;
-
+    //车辆类型名称 (1 固定车辆-非家属院居住 2 固定车辆-家属院居住 3 月租车辆 4 业务往来车辆 5 临时车辆)
     private String rosterTypeName;
-
-    private String memberName;
-
-    private String roster_type;
-
-    private List<Integer> carnoIds;//车牌ID
-
-    //用户openId
-    private String openId;
-
-
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    private Date bindTime;
-
-    List<String> parkNames;
-
-    List<String> roadNames;
-
-    private String companyName;
 
     //创建人姓名
     private String userName;
 
-    private Integer parkId;
-    private Integer roadId;
+    //车主姓名
+    private String name;
 
-    private Integer area_id;
-    private Integer street_id;
+    //车主手机号码
+    private String phone;
+    private String parkId;
+    private String carNo;
+
+    private Integer pageNo;
+    private Integer pageSize;
+
 
 }

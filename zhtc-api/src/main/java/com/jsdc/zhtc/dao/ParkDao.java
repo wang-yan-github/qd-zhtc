@@ -20,10 +20,8 @@ public class ParkDao extends BaseDao<Park> {
 
     public String toList(Park park) {
         StringBuilder sql = new StringBuilder();
-        sql.append("SELECT park.*, area.area_name,street.street_name FROM park ");
-        sql.append("LEFT JOIN area ON park.area_id = area.id ");
-        sql.append("LEFT JOIN street ON park.street_id = street.id ");
-        sql.append("where 1=1 ");
+        sql.append("SELECT park.* FROM park park");
+        sql.append(" where 1=1 ");
 
         if (park.getId() != null) {
             sql.append(" AND park.id=" + park.getId());
@@ -32,12 +30,13 @@ public class ParkDao extends BaseDao<Park> {
         if (StringUtils.isNotEmpty(park.getPark_name())) {
             sql.append(" AND park.park_name LIKE '%" + park.getPark_name() + "%'");
         }
-        if (park.getArea_id() != null) {
-            sql.append(" AND park.area_id=" + park.getArea_id());
+        if (StringUtils.isNotEmpty(park.getPark_grades())) {
+            sql.append(" AND park.park_grade in(" + park.getPark_grades() + ")");
         }
-        if (park.getStreet_id() != null) {
-            sql.append(" AND park.street_id=" + park.getStreet_id());
+        if (park.getPark_code() != null) {
+            sql.append(" AND park.park_code=" + park.getPark_code());
         }
+
         sql.append(" AND park.is_del=0");
         return sql.toString();
     }

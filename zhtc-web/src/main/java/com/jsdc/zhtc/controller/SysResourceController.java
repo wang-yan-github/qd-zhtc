@@ -3,7 +3,6 @@ package com.jsdc.zhtc.controller;
 import com.github.pagehelper.PageInfo;
 import com.jsdc.core.base.BaseController;
 import com.jsdc.zhtc.common.aop.logaop.LogInfo;
-import com.jsdc.zhtc.common.utils.AjaxResult;
 import com.jsdc.zhtc.enums.LogEnums;
 import com.jsdc.zhtc.model.SysResource;
 import com.jsdc.zhtc.service.FileManageService;
@@ -66,10 +65,10 @@ public class SysResourceController extends BaseController {
      */
     @RequestMapping(value = "details.json", method = RequestMethod.POST)
     @ResponseBody
-    public AjaxResult details(SysResource bean) {
+    public ResultInfo details(SysResource bean) {
         bean = sysResourceService.selectById(bean.getId());
         bean.setFileList(fileManageService.selectByFiles(bean.getPicture_id()));
-        return AjaxResult.success(bean);
+        return ResultInfo.success(bean);
     }
 
     /**
@@ -83,10 +82,10 @@ public class SysResourceController extends BaseController {
      */
     @RequestMapping(value = "toList.do", method = RequestMethod.POST)
     @ResponseBody
-    public AjaxResult toList(@RequestParam(defaultValue = "1") Integer pageIndex,
+    public ResultInfo toList(@RequestParam(defaultValue = "1") Integer pageIndex,
                              @RequestParam(defaultValue = "10") Integer pageSize, SysResource sysResource) {
         List<SysResource> list = sysResourceService.selectPageList(sysResource, pageIndex, pageSize);
-        return AjaxResult.success(new PageInfo<>(list));
+        return ResultInfo.success(new PageInfo<>(list));
     }
 
     /**
@@ -110,11 +109,11 @@ public class SysResourceController extends BaseController {
      */
     @RequestMapping(value = "questDetails.json", method = RequestMethod.POST)
     @ResponseBody
-    public AjaxResult questDetails() {
+    public ResultInfo questDetails() {
         SysResource bean = new SysResource();
         //类别 0:文档 1：操作指南 2:常见问题 3轮播图 4 公告资讯
         bean.setCategory("2");
-        return AjaxResult.success(sysResourceService.selectBean(bean));
+        return ResultInfo.success(sysResourceService.selectBean(bean));
     }
 
 }

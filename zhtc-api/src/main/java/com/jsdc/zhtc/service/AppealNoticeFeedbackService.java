@@ -30,11 +30,7 @@ import java.util.List;
 public class AppealNoticeFeedbackService extends BaseService<AppealNoticeFeedbackDao, AppealNoticeFeedback> {
 
     @Autowired
-    private InspectManageService inspectManageService;
-    @Autowired
     private AppealNoticeFeedbackMapper appealNoticeFeedbackMapper;
-    @Autowired
-    private SectionInspectorService sectionInspectorService;
 
     /**
      * create by wp at 2022/1/14 13:57

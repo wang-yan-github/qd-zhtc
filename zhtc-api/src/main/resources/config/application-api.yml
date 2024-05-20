@@ -135,7 +135,7 @@ jsdc:
   loadPicPath: http://127.0.0.1:8080/fileManage/getImgView.do?id=
 #  loadPicPath2: http://211.103.125.189:9053/
 #  loadPicPath2: http://192.168.0.93:82/
-  loadPicPath2: http://192.168.0.104:8010/
+  loadPicPath2: http://172.168.95.35:8010/
   fileUrl: /Users/wangyan/Desktop/posapk/
   #车牌识别服务url
   uploadUrl: http://127.0.0.1:8866/getCarnoByImage
@@ -146,9 +146,9 @@ jsdc:
       open: http://127.0.0.1:8081/parkingplat/openGate.do
       close: http://127.0.0.1:8081/parkingplat/closeGate.do
     dc:
-      open: http://127.0.0.1:8081/dc/openGate.do
-      close: http://127.0.0.1:8081/dc/closeGate.do
-      voice: http://127.0.0.1:8081/dc/voice.do
+      open: http://127.0.0.1:8080/dc/openGate.do
+      close: http://127.0.0.1:8080/dc/closeGate.do
+      voice: http://127.0.0.1:8080/dc/voice.do
       startRtmp: http://127.0.0.1:8081/dc/startRtmp.do
       stopRtmp: http://127.0.0.1:8081/dc/stopRtmp.do
   #停车场闸机车辆图片url
@@ -191,7 +191,7 @@ mqtt:
   subTopic: "/a1BkUFnh0eA/108e6e026d0e2a63/user/update"
   pubTopic: "/a1BkUFnh0eA/108e6e026d0e2a63/user/set"
   #  broker: "tcp://58.218.188.178:1883"
-  broker: "tcp://192.168.0.170:1883"
+  broker: "tcp://172.168.95.35:1883"
   subClientId: "sub_client_104"
   pubClientId: "pub_client_104"
   max_reconnect_time: 30

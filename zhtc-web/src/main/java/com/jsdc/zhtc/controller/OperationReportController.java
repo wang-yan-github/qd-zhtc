@@ -2,7 +2,6 @@ package com.jsdc.zhtc.controller;
 
 import com.github.pagehelper.PageInfo;
 import com.jsdc.jpush.api.excelderive.ExcelDeriveModel;
-import com.jsdc.zhtc.service.MonthlyManagementService;
 import com.jsdc.zhtc.service.ParkingOrderService;
 import com.jsdc.zhtc.vo.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -36,9 +35,6 @@ public class OperationReportController {
 
     @Autowired
     private ParkingOrderService parkingOrderService;
-
-    @Autowired
-    private MonthlyManagementService monthlyManagementService;
 
 
     /**
@@ -99,7 +95,7 @@ public class OperationReportController {
     public ResultInfo getMonthCarRentalDetail(@RequestBody CommonVo data) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         data.setStr(sdf.format(new Date()));
-        return ResultInfo.success(monthlyManagementService.getMonthCarRentalDetailPage(data));
+        return ResultInfo.success();
     }
 
     /**
@@ -116,8 +112,7 @@ public class OperationReportController {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         data.setStr(sdf.format(new Date()));
         //获取数据
-        ShouldBillRankingVo sbrvo = monthlyManagementService.getMonthCarRentalStatistics(data);
-        return ResultInfo.success(sbrvo);
+        return ResultInfo.success();
     }
 
     /**
@@ -131,19 +126,19 @@ public class OperationReportController {
     @RequestMapping(value = "/MonthCarRentalExcel", method = RequestMethod.POST)
     @ResponseBody
     public void MonthCarRentalExcel(HttpServletRequest request, HttpServletResponse response, @RequestBody CommonVo data) throws Exception {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        data.setStr(sdf.format(new Date()));
-//        data.setStr("2022-02-10");
-        List<MonthCarRentalDetailVo> list = monthlyManagementService.getMonthCarRentalDetail(data);
-        ShouldBillRankingVo sbrvo = monthlyManagementService.getMonthCarRentalStatistics(data);
-
-        String path = ExcelDeriveModel.class.getResource("/masterplate/yzcDetail.xlsx").getPath();
-        FileInputStream tps = new FileInputStream(new File(path));
-        XSSFWorkbook tpWorkbook = new XSSFWorkbook(tps);
-        XSSFWorkbook workbook = new XSSFWorkbook();
-        workbook = tpWorkbook;
-        //填写数据
-        ExcelDeriveModel.MonthCarRentalExcel(workbook, response, list, sbrvo, sdf);
+//        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+//        data.setStr(sdf.format(new Date()));
+////        data.setStr("2022-02-10");
+//        List<MonthCarRentalDetailVo> list = monthlyManagementService.getMonthCarRentalDetail(data);
+//        ShouldBillRankingVo sbrvo = monthlyManagementService.getMonthCarRentalStatistics(data);
+//
+//        String path = ExcelDeriveModel.class.getResource("/masterplate/yzcDetail.xlsx").getPath();
+//        FileInputStream tps = new FileInputStream(new File(path));
+//        XSSFWorkbook tpWorkbook = new XSSFWorkbook(tps);
+//        XSSFWorkbook workbook = new XSSFWorkbook();
+//        workbook = tpWorkbook;
+//        //填写数据
+//        ExcelDeriveModel.MonthCarRentalExcel(workbook, response, list, sbrvo, sdf);
     }
 
 
@@ -256,8 +251,8 @@ public class OperationReportController {
     @RequestMapping(value = "/byExport", method = RequestMethod.POST)
     @ResponseBody
     public ResultInfo byExport(String isTheCompany, String parkingType) {
-        String name = monthlyManagementService.byExport(isTheCompany, parkingType);
-        return ResultInfo.success(name);
+//        String name = monthlyManagementService.byExport(isTheCompany, parkingType);
+        return ResultInfo.success();
     }
 
 

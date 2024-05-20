@@ -1,8 +1,6 @@
 package com.jsdc.zhtc.controller;
 
-import com.jsdc.zhtc.service.MonthlyManagementService;
 import com.jsdc.zhtc.service.ParkingOrderService;
-import com.jsdc.zhtc.service.RechargeManagementService;
 import com.jsdc.zhtc.vo.ResultInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,12 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("platformsurvey")
 public class PlatformSurveyController {
 
-    @Autowired
-    private ParkingOrderService parkingOrderService;
-    @Autowired
-    private MonthlyManagementService monthlyManagementService;
-    @Autowired
-    private RechargeManagementService rechargeManagementService;
 
     /**
      * 描 述： TODO(查询当日注册人数)

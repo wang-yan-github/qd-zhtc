@@ -2,6 +2,8 @@ package com.jsdc.zhtc.vo.order;
 
 import lombok.Data;
 
+import java.util.Date;
+
 /**
  * ClassName: Payment
  * Description:
@@ -24,7 +26,8 @@ public class PaymentVo {
     //支付金额
     private String zf_money;
     private String free_type;
-
+    private String inTime;
+    private String outTime;
     public PaymentVo() {
     }
 

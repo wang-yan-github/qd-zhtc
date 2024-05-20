@@ -5,7 +5,6 @@ import com.jsdc.zhtc.common.constants.GlobalData;
 import com.jsdc.zhtc.common.utils.StringUtils;
 import com.jsdc.zhtc.common.utils.TimeUtils;
 import com.jsdc.zhtc.model.ParkingOrder;
-import com.jsdc.zhtc.service.AttendanceManagementService;
 import com.jsdc.zhtc.service.OperateCarnoService;
 import com.jsdc.zhtc.service.ParkingOrderService;
 import com.jsdc.zhtc.vo.order.AppealRecordVo;
@@ -32,10 +31,6 @@ import java.util.List;
 public class OrderTask {
     @Autowired
     private ParkingOrderService parkingOrderService;
-    @Autowired
-    private OperateCarnoService carnoService;
-    @Autowired
-    private AttendanceManagementService attendanceManagementService;
 
     @Value("${heartBeat.period}")
     private int period;
@@ -72,36 +67,6 @@ public class OrderTask {
             parkingOrder.updateById();
         }
     }
-
-    /**
-     * 每天刷新一次车牌是否超期免税时间，若超期则置为普通车辆
-     */
-    @Scheduled(cron = "59 59 11 * * ?")
-    public void freshCarnoRoster() {
-        System.out.println("----------------------免税车定时任务开始-------------------------------");
-        carnoService.freshCarnoRoster();
-        System.out.println("----------------------免税车定时任务结束-------------------------------");
-    }
-
-    /**
-     * 定时任务
-     * 1.每日0时生成打卡记录
-     * 修改昨日未打卡数据为旷工状态
-     * 收费员、巡检员
-     * 0时 1分
-     * 2.个人白名单车辆 定时任务 修改已到期车牌和待生效白名单车牌
-     */
-    @Scheduled(cron = "0 1 0 * * ?")
-    public void onCreateSignRecord() {
-        //1.修改昨日未打卡数据为旷工状态
-        attendanceManagementService.onCreateRecord();
-
-        //2.个人白名单车辆 定时任务 修改已到期车牌和待生效白名单车牌
-        carnoService.onUpdExpiredWhiteList();
-
-        System.out.println(new DateTime().toString("yyyy-MM-dd") + "------------------------生成收费员/巡检员打卡记录----------------------------");
-    }
-
 
     /**
      * 5分钟执行一次

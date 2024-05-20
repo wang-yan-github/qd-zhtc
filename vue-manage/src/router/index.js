@@ -4,12 +4,20 @@ import Home from "../views/Home.vue";
 const routes = [
     {
         path: '/',
-        redirect: '/dashboard'
+        redirect: '/dashboardA'
     }, {
         path: "/",
         name: "Home",
         component: Home,
         children: [
+            {
+                path: "/dashboardA",
+                name: "dashboardA",
+                meta: {
+                    title: '停车场概览'
+                },
+                component: () => import("../views/park/realdata/Dashboard.vue")
+            },
             {
                 path: "/dashboard",
                 name: "dashboard",
@@ -789,13 +797,6 @@ const routes = [
                     title: '发票发放记录'
                 },
                 component: () => import("../views/park/caiwu/providerecord.vue")
-            }, {
-                path: "/dashboardA",
-                name: "dashboardA",
-                meta: {
-                    title: '停车场概览'
-                },
-                component: () => import("../views/park/realdata/Dashboard.vue")
             }, {
                 path: "/roadrealmonitorA",
                 name: "roadrealmonitorA",

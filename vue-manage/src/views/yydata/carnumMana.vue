@@ -212,33 +212,33 @@
         <!-- 车牌录入 end-->
         <div class="container mt20">
             <div class="handle-box">
-                <div class="left-panel">
-                    <el-button
-                            type="primary"
-                            size="small"
-                            icon="el-icon-plus"
-                            @click="batchAdd()"
-                            v-permission="['road_carnummana_pljrbmd', 'park_carnummana_pljrbmd']"
-                    >批量加入白名单
-                    </el-button>
-                    <el-button
-                            type="primary"
-                            size="small"
-                            icon="el-icon-document"
-                            @click="excelImport()"
-                            v-permission="['road_carnummana_bmddr', 'park_carnummana_bmddr']"
-                    >白名单Excel导入
-                    </el-button>
+                <!--<div class="left-panel">-->
                     <!--<el-button-->
-                    <!--type="primary"-->
-                    <!--size="small"-->
-                    <!--icon="el-icon-plus"-->
-                    <!--@click="carAdd()"-->
-                    <!--v-permission="['road_carnummana_cplr', 'park_carnummana_cplr']"-->
-                    <!--&gt;车牌录入-->
+                            <!--type="primary"-->
+                            <!--size="small"-->
+                            <!--icon="el-icon-plus"-->
+                            <!--@click="batchAdd()"-->
+                            <!--v-permission="['road_carnummana_pljrbmd', 'park_carnummana_pljrbmd']"-->
+                    <!--&gt;批量加入白名单-->
                     <!--</el-button>-->
-                </div>
-                <div class="right-panel">
+                    <!--<el-button-->
+                            <!--type="primary"-->
+                            <!--size="small"-->
+                            <!--icon="el-icon-document"-->
+                            <!--@click="excelImport()"-->
+                            <!--v-permission="['road_carnummana_bmddr', 'park_carnummana_bmddr']"-->
+                    <!--&gt;白名单Excel导入-->
+                    <!--</el-button>-->
+                    <!--&lt;!&ndash;<el-button&ndash;&gt;-->
+                    <!--&lt;!&ndash;type="primary"&ndash;&gt;-->
+                    <!--&lt;!&ndash;size="small"&ndash;&gt;-->
+                    <!--&lt;!&ndash;icon="el-icon-plus"&ndash;&gt;-->
+                    <!--&lt;!&ndash;@click="carAdd()"&ndash;&gt;-->
+                    <!--&lt;!&ndash;v-permission="['road_carnummana_cplr', 'park_carnummana_cplr']"&ndash;&gt;-->
+                    <!--&lt;!&ndash;&gt;车牌录入&ndash;&gt;-->
+                    <!--&lt;!&ndash;</el-button>&ndash;&gt;-->
+                <!--</div>-->
+                <!--<div class="right-panel">-->
                     <el-form inline label-width="80" size="small" class="lineH0">
                         <el-form-item label="姓名" class="search-mb0">
                             <el-input
@@ -365,7 +365,7 @@
                           </el-button>
                         </el-form-item>
                     </el-form>
-                </div>
+                <!--</div>-->
                 <div class="clear"></div>
             </div>
             <el-table
@@ -576,45 +576,45 @@
                         >删除
                         </el-button>
 
-                        <el-dropdown class="ml10 blue">
-              <span class="el-dropdown-link" style="cursor: pointer">
-                更多操作<i class="el-icon-arrow-down el-icon--right"></i>
-              </span>
-                            <template v-slot:dropdown>
-                                <el-dropdown-menu>
-                                    <el-dropdown-item
-                                            icon="el-icon-circle-close"
-                                            @click="bindRoad(scope.$index, scope.row)"
-                                            v-permission="['road_carnummana_jb', 'park_carnummana_jb']"
-                                    >解绑
-                                    </el-dropdown-item>
-                                    <el-dropdown-item
-                                            icon="el-icon-plus"
-                                            @click="handleCommand('1', scope.row)"
-                                            v-permission="['road_carnummana_ptmd', 'park_carnummana_ptmd']"
-                                    >普通名单
-                                    </el-dropdown-item>
-                                    <el-dropdown-item
-                                            icon="el-icon-plus"
-                                            @click="handleCommand('2', scope.row)"
-                                            v-permission="['road_carnummana_jhmd', 'park_carnummana_jhmd']"
-                                    >加黑名单
-                                    </el-dropdown-item>
-                                    <el-dropdown-item
-                                            icon="el-icon-plus"
-                                            @click="handleCommand('3', scope.row)"
-                                            v-permission="['road_carnummana_jbmd', 'park_carnummana_jbmd']"
-                                    >加白名单
-                                    </el-dropdown-item>
-                                    <el-dropdown-item
-                                            icon="el-icon-plus"
-                                            @click="handleCommand('4', scope.row)"
-                                            v-permission="['road_carnummana_jcjrmd', 'park_carnummana_jcjrmd']"
-                                    >加残疾人名单
-                                    </el-dropdown-item>
-                                </el-dropdown-menu>
-                            </template>
-                        </el-dropdown>
+                        <!--<el-dropdown class="ml10 blue">-->
+              <!--<span class="el-dropdown-link" style="cursor: pointer">-->
+                <!--更多操作<i class="el-icon-arrow-down el-icon&#45;&#45;right"></i>-->
+              <!--</span>-->
+                            <!--<template v-slot:dropdown>-->
+                                <!--<el-dropdown-menu>-->
+                                    <!--<el-dropdown-item-->
+                                            <!--icon="el-icon-circle-close"-->
+                                            <!--@click="bindRoad(scope.$index, scope.row)"-->
+                                            <!--v-permission="['road_carnummana_jb', 'park_carnummana_jb']"-->
+                                    <!--&gt;解绑-->
+                                    <!--</el-dropdown-item>-->
+                                    <!--<el-dropdown-item-->
+                                            <!--icon="el-icon-plus"-->
+                                            <!--@click="handleCommand('1', scope.row)"-->
+                                            <!--v-permission="['road_carnummana_ptmd', 'park_carnummana_ptmd']"-->
+                                    <!--&gt;普通名单-->
+                                    <!--</el-dropdown-item>-->
+                                    <!--<el-dropdown-item-->
+                                            <!--icon="el-icon-plus"-->
+                                            <!--@click="handleCommand('2', scope.row)"-->
+                                            <!--v-permission="['road_carnummana_jhmd', 'park_carnummana_jhmd']"-->
+                                    <!--&gt;加黑名单-->
+                                    <!--</el-dropdown-item>-->
+                                    <!--<el-dropdown-item-->
+                                            <!--icon="el-icon-plus"-->
+                                            <!--@click="handleCommand('3', scope.row)"-->
+                                            <!--v-permission="['road_carnummana_jbmd', 'park_carnummana_jbmd']"-->
+                                    <!--&gt;加白名单-->
+                                    <!--</el-dropdown-item>-->
+                                    <!--<el-dropdown-item-->
+                                            <!--icon="el-icon-plus"-->
+                                            <!--@click="handleCommand('4', scope.row)"-->
+                                            <!--v-permission="['road_carnummana_jcjrmd', 'park_carnummana_jcjrmd']"-->
+                                    <!--&gt;加残疾人名单-->
+                                    <!--</el-dropdown-item>-->
+                                <!--</el-dropdown-menu>-->
+                            <!--</template>-->
+                        <!--</el-dropdown>-->
                     </template>
                 </el-table-column>
             </el-table>

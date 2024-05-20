@@ -7,9 +7,7 @@ import com.jsdc.core.base.Base;
 import com.jsdc.jpush.api.excelderive.ExcelDeriveModel;
 import com.jsdc.zhtc.common.constants.GlobalData;
 import com.jsdc.zhtc.model.SysUser;
-import com.jsdc.zhtc.service.MonthlyManagementService;
 import com.jsdc.zhtc.service.ParkingOrderService;
-import com.jsdc.zhtc.service.RechargeManagementService;
 import com.jsdc.zhtc.service.SysUserService;
 import com.jsdc.zhtc.utils.ArithmeticUtils;
 import com.jsdc.zhtc.vo.CommonVo;
@@ -40,15 +38,10 @@ import java.util.*;
 @RequestMapping("parkingplatformsurvey")
 public class ParkingPlatformSurveyController {
 
-
-    @Autowired
-    private MonthlyManagementService mmService;
     @Autowired
     private ParkingOrderService parkingOrderService;
     @Autowired
     private SysUserService sysUserService;
-    @Autowired
-    private RechargeManagementService rechargeManagementService;
 
 
     /**
@@ -68,10 +61,10 @@ public class ParkingPlatformSurveyController {
         Integer park_id = user.getPark_id();
 
 
-        //车辆包月数
-        Integer mpCount = mmService.getMonthlyPaymentCount(GlobalData.PARKING_TYPE_PLAT, dateStr, park_id);
-        //车辆包月总收入
-        String sumCost = mmService.getMonthlyPaymentSumCost(GlobalData.PARKING_TYPE_PLAT, dateStr, park_id);
+//        //车辆包月数
+//        Integer mpCount = mmService.getMonthlyPaymentCount(GlobalData.PARKING_TYPE_PLAT, dateStr, park_id);
+//        //车辆包月总收入
+//        String sumCost = mmService.getMonthlyPaymentSumCost(GlobalData.PARKING_TYPE_PLAT, dateStr, park_id);
         //流动订单数
         Integer soCount = parkingOrderService.getStreamingOrderCount(dateStr, park_id);
 
@@ -86,8 +79,8 @@ public class ParkingPlatformSurveyController {
         String bl = ArithmeticUtils.getBl(toDaySumAmount, yesterdaySumAmount);
 
         HashMap<String, Object> map = new HashMap<>();
-        map.put("mpCount", mpCount == null ? 0 : mpCount);
-        map.put("sumCost", sumCost);
+//        map.put("mpCount", mpCount == null ? 0 : mpCount);
+//        map.put("sumCost", sumCost);
         map.put("soCount", soCount);
         map.put("sumAmount", ArithmeticUtils.setScale1(toDaySumAmount, 2, BigDecimal.ROUND_HALF_UP).toString());
         map.put("bl", bl);
@@ -115,7 +108,7 @@ public class ParkingPlatformSurveyController {
         BeanUtils.copyProperties(data, data2);
         for (ShouldBillRankingVo rankingVo : parkingOrderRanking) {
             data2.setParkId(rankingVo.getId());
-            rankingVo.setPaymentOrderList(mmService.getMonthlyAmountGroup(data2));
+//            rankingVo.setPaymentOrderList(mmService.getMonthlyAmountGroup(data2));
         }
 
         //停车订单数排名
@@ -129,12 +122,12 @@ public class ParkingPlatformSurveyController {
 
         //停车区类型 0：路段 1：停车场 2:场站
         data.setParking_type("1");
-        //包月收入
-        String sumCost = mmService.getMonthlyPaymentSum(data);
-        vo.setByAmount(sumCost);
-        //充值收入
-        String czMoney = rechargeManagementService.getSumCzMoney(data);
-        vo.setCzAmount(czMoney);
+//        //包月收入
+//        String sumCost = mmService.getMonthlyPaymentSum(data);
+//        vo.setByAmount(sumCost);
+//        //充值收入
+//        String czMoney = rechargeManagementService.getSumCzMoney(data);
+//        vo.setCzAmount(czMoney);
 
         //营收合计
 //        double money = Double.parseDouble(vo.getPaidAmount()) + Double.parseDouble(vo.getByAmount()) + Double.parseDouble(vo.getCzAmount());
@@ -164,7 +157,7 @@ public class ParkingPlatformSurveyController {
         BeanUtils.copyProperties(data, data2);
         for (ShouldBillRankingVo rankingVo : parkingOrderRanking) {
             data2.setParkId(rankingVo.getId());
-            rankingVo.setPaymentOrderList(mmService.getMonthlyAmountGroup(data2));
+//            rankingVo.setPaymentOrderList(mmService.getMonthlyAmountGroup(data2));
         }
 
         //临停收入、临停欠费金额
@@ -176,11 +169,11 @@ public class ParkingPlatformSurveyController {
         //停车区类型 0：路段 1：停车场 2:场站
         data.setParking_type("1");
         //包月收入
-        String sumCost = mmService.getMonthlyPaymentSum(data);
-        vo.setByAmount(sumCost);
+//        String sumCost = mmService.getMonthlyPaymentSum(data);
+//        vo.setByAmount(sumCost);
         //充值收入
-        String czMoney = rechargeManagementService.getSumCzMoney(data);
-        vo.setCzAmount(czMoney);
+//        String czMoney = rechargeManagementService.getSumCzMoney(data);
+//        vo.setCzAmount(czMoney);
 
         //营收合计
 //        double money = Double.parseDouble(vo.getPaidAmount()) + Double.parseDouble(vo.getByAmount()) + Double.parseDouble(vo.getCzAmount());
@@ -236,12 +229,12 @@ public class ParkingPlatformSurveyController {
             //日期
             dates.add(sdf2.format(date));
             String dateStr = sdf.format(date);
-            //车辆包月数
-            Integer mpCount = mmService.getMonthlyPaymentCount(GlobalData.PARKING_TYPE_PLAT, dateStr, park_id);
-            monthlyCount.add(mpCount.toString());
-            //车辆包月总收入
-            String sumCost = mmService.getMonthlyPaymentSumCost(GlobalData.PARKING_TYPE_PLAT, dateStr, park_id);
-            monthlyIncome.add(sumCost);
+//            //车辆包月数
+//            Integer mpCount = mmService.getMonthlyPaymentCount(GlobalData.PARKING_TYPE_PLAT, dateStr, park_id);
+//            monthlyCount.add(mpCount.toString());
+//            //车辆包月总收入
+//            String sumCost = mmService.getMonthlyPaymentSumCost(GlobalData.PARKING_TYPE_PLAT, dateStr, park_id);
+//            monthlyIncome.add(sumCost);
         }
         return ResultInfo.success(retMap);
 
@@ -313,8 +306,8 @@ public class ParkingPlatformSurveyController {
     @ResponseBody
     public ResultInfo getMonthlyPaymentData(@RequestBody CommonVo data) {
         //停车场
-        return mmService.getMonthlyPaymentData(data);
-
+//        return mmService.getMonthlyPaymentData(data);
+        return ResultInfo.success();
     }
 
     /**
@@ -323,6 +316,6 @@ public class ParkingPlatformSurveyController {
      */
     @RequestMapping(value = "exportBy", method = RequestMethod.POST)
     public void exportBy(HttpServletResponse response, @RequestBody CommonVo data) throws Exception {
-        mmService.exportExcel(data, response);
+//        mmService.exportExcel(data, response);
     }
 }

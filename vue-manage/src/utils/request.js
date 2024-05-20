@@ -11,15 +11,11 @@ const service = axios.create({
     timeout: 50000
 });
 service.interceptors.request.use(
-
     config => {
-        console.log('------- ' + config.url);
         if (('null' == localStorage.getItem("token_value") || null == localStorage.getItem("token_value")) && config.url != '/login.do') {
-
             window.location.href = "/login"
         }
         else {
-            console.info(localStorage.getItem("token_value"));
             config.headers.Authorization = localStorage.getItem("token_value");
         }
         return config;

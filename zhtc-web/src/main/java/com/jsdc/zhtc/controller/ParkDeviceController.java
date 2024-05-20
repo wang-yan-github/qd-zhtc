@@ -246,7 +246,7 @@ public class ParkDeviceController extends BaseController {
         }
         String param = "deviceCode=" + deviceCode;
         //zhtc1服务器 mqtt订阅接口路径 线上地址：http://2.69.254.21:8083
-        String result = HttpUtils.sendPost("http://2.69.254.21:8083" + "/mqtt/addTopic", param);
+        String result = HttpUtils.sendPost("http://localhost:8080" + "/mqtt/addTopic", param);
 //        String result = HttpUtils.sendPost( "http://192.168.0.104:8081"+ "/mqtt/addTopic", param);
         ResultInfo resultInfo = JSON.parseObject(result, ResultInfo.class);
         return resultInfo;
