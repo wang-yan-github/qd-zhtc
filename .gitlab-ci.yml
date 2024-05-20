@@ -148,6 +148,7 @@ build vue:
   stage: build vue
   only:
     - build
+    - build-vue
   script:
     - echo "=============== 开始打包任务  ==============="
     - cd $WEB_PATH
@@ -163,6 +164,7 @@ deploy vue:
   stage: deploy vue
   only:
     - build
+    - deploy-vue
   script:
     - echo "=============== 开始部署任务  ==============="
     - cd $WEB_PATH
