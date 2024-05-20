@@ -12,7 +12,13 @@ variables:
 cache:
   key: "shared-cache"
   paths:
+    - $WEB_PATH/node_modules/
+    - $WEB_PATH/dist/
+    - $WEB_PATH/.npm/
+    - $WEB_PATH/$WEB_PATH/
     - .m2/repository
+    - $API_PATH/target/
+    - $API_MQTT_PATH/target/
 
 # 阶段
 stages:
@@ -30,9 +36,6 @@ stages:
 maven install:
   image: maven:3.6.3-jdk-8-slim
   stage: maven install
-  cache:
-    paths:
-      - $API_PATH/target/
   only:
     - install
     - maven-install
@@ -48,9 +51,6 @@ maven install:
 maven package:
   image: maven:3.6.3-jdk-8-slim
   stage: maven package
-  cache:
-    paths:
-      - $API_PATH/target/
   only:
     - build
   script:
@@ -65,9 +65,6 @@ maven package:
 deploy jar:
   image: docker
   stage: deploy jar
-  cache:
-    paths:
-      - $API_PATH/target/
   only:
     - build
   script:
@@ -81,9 +78,6 @@ deploy jar:
 maven mqtt install:
   image: maven:3.6.3-jdk-8-slim
   stage: maven mqtt install
-  cache:
-    paths:
-      - $API_MQTT_PATH/target/
   only:
     - install
     - maven-mqtt-install
@@ -99,9 +93,6 @@ maven mqtt install:
 maven mqtt package:
   image: maven:3.6.3-jdk-8-slim
   stage: maven mqtt package
-  cache:
-    paths:
-      - $API_MQTT_PATH/target/
   only:
     - build
   script:
@@ -116,9 +107,6 @@ maven mqtt package:
 deploy mqtt jar:
   image: docker
   stage: deploy mqtt jar
-  cache:
-    paths:
-      - $API_MQTT_PATH/target/
   only:
     - build
   script:
@@ -132,9 +120,6 @@ deploy mqtt jar:
 npm install:
   image: node:18
   stage: npm install
-  cache:
-    paths:
-      - $WEB_PATH/node_modules/
   only:
     - install
     - npm-install
@@ -147,8 +132,13 @@ npm install:
     - echo "deb http://mirrors.aliyun.com/debian buster-updates main contrib non-free" >> /etc/apt/sources.list
     - apt-get update
     - apt-get install -y libpango1.0-dev
+    - echo "registry=https://registry.npmmirror.com/" > ~/.npmrc
     - npm install canvas@2.9.3 --build-from-source --legacy-peer-deps
-    - npm install --global pnpm
+    - npm install -g pnpm
+    - pnpm config set registry https://registry.npmmirror.com/
+    - pnpm config set fetch-retry-maxtimeout 60000
+    - pnpm config set fetch-retry-mintimeout 10000
+    - pnpm config set fetch-retries 5
     - pnpm install
     - ls -l
     - echo "=============== 执行结束 ==================="
@@ -156,9 +146,6 @@ npm install:
 build vue:
   image: node:18
   stage: build vue
-  cache:
-    paths:
-      - $WEB_PATH/node_modules/
   only:
     - build
   script:
@@ -174,9 +161,6 @@ build vue:
 deploy vue:
   image: docker
   stage: deploy vue
-  cache:
-    paths:
-      - $WEB_PATH/target/
   only:
     - build
   script:
